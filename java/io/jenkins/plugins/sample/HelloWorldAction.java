@@ -27,12 +27,11 @@ public class HelloWorldAction implements RunAction2 {
 	report = bugReportInfo.get("report");
 	codeLocation = tp.checkoutCodeVersion(index);
 
-	importantWordsGen.generate("This is a test setence.");
+	Map<String, Integer> words = importantWordsGen.generate("This is a test setence.");
     }
 
     public String getName() {
-	//return tp.getID();
-	return importantWordsGen.generate("This is a testSetence.");
+	return tp.getID();
 	//return tp.testMeth();
 	//return Integer.toString(tp.getNumOfBugs());
 	//return tp.getBugInformation(1).get("report");

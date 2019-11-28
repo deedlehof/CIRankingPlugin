@@ -2,10 +2,9 @@ package io.jenkins.plugins.sample;
 
 import java.io.*;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
-import java.lang.StringBuilder;
-import java.lang.System;
 
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.stemmer.PorterStemmer;
@@ -18,8 +17,6 @@ public class ImportantWordsGenerator {
 
     //Path to stop words file
     public static String STOPWORDSFILE;
-    //Important word seperator
-    public static final String WORDSEPARATOR = " ";
 
     private static HashSet<String> stopWords;
 
@@ -59,36 +56,44 @@ public class ImportantWordsGenerator {
 	}
 
     }
+    
+    public Map<String, Integer> generate(String input) {
+	//Map of unique words with occurrence
+	Map<String, Integer> occurrences = new HashMap<String, Integer>();
+	return extendGeneration(input, occurrences);	
+    }
 
-    public String generate(String input) {
+    public Map<String, Integer> extendGeneration(String input, Map<String, Integer> occurrences) {
+	//Takes a string input and a map of occurrences
+	//Occurrences is a map of unique words with their number of occurrences
 	//Convert the input into tokens
 	String tokens[] = tokenizer.tokenize(input);
-	//Result string builder
-	StringBuilder result = new StringBuilder();
     
-
 	for (String token: tokens){
 	    //Split a token by Capital letters
 	    String[] subTokens = StringUtils.splitByCharacterTypeCamelCase(token);
 	    for (String subToken: subTokens) {
-		//If the subToken isn't a stopword, then add it to result
+		//If the subToken isn't a stopword, then add it to occurrences
 		if (!stopWords.contains(subToken)) {
-		    //
-		    result.append(stemmer.stem(subToken));
-		    result.append(WORDSEPARATOR);
+		    //stem the word
+		    String stemmedToken = stemmer.stem(subToken);
+		    //add one to the number of occurences or set to 1 if doesn't exist
+		    occurrences.put(stemmedToken, occurrences.getOrDefault(stemmedToken, 0) + 1);
 		}
 	    }
 	    //Add the original token if it was broken up
 	    if (subTokens.length > 1) {
 		//If the token isn't a stopword, then add it to result
 		if (!stopWords.contains(token)) {
-		    result.append(stemmer.stem(token));
-		    result.append(WORDSEPARATOR);
+		    //stem the word
+		    String stemmedToken = stemmer.stem(token);
+		    //add one to the number of occurences or set to 1 if doesn't exist
+		    occurrences.put(stemmedToken, occurrences.getOrDefault(stemmedToken, 0) + 1);
 		}
 	    }
 	    
 	}
-	return result.toString();	
+	return occurrences;	
     }
 
 }
