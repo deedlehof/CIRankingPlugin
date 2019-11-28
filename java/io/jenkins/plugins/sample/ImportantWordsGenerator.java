@@ -1,15 +1,14 @@
 package io.jenkins.plugins.sample;
 
-//import java.io.File;
-//import java.io.BufferedReader;
-//import java.io.FileReader;
 import java.io.*;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Properties;
 import java.lang.StringBuilder;
 import java.lang.System;
 
 import opennlp.tools.tokenize.SimpleTokenizer;
+import opennlp.tools.stemmer.PorterStemmer;
 import org.apache.commons.lang.StringUtils;
 
 public class ImportantWordsGenerator {
@@ -25,12 +24,14 @@ public class ImportantWordsGenerator {
     private static HashSet<String> stopWords;
 
     private final SimpleTokenizer tokenizer;
+    private final PorterStemmer stemmer;
 
     private ImportantWordsGenerator() {
 	String fileSep = File.separator;
 	STOPWORDSFILE = System.getProperty("user.home") + fileSep + ".BugRanking" + fileSep + "stop_words.txt";
 	
 	tokenizer = SimpleTokenizer.INSTANCE;
+	stemmer = new PorterStemmer();
 
 	//Initialize stopWords and fill it with words from STOPWORDSFILE
 	stopWords = new HashSet<String>();
@@ -72,7 +73,8 @@ public class ImportantWordsGenerator {
 	    for (String subToken: subTokens) {
 		//If the subToken isn't a stopword, then add it to result
 		if (!stopWords.contains(subToken)) {
-		    result.append(subToken);
+		    //
+		    result.append(stemmer.stem(subToken));
 		    result.append(WORDSEPARATOR);
 		}
 	    }
@@ -80,7 +82,7 @@ public class ImportantWordsGenerator {
 	    if (subTokens.length > 1) {
 		//If the token isn't a stopword, then add it to result
 		if (!stopWords.contains(token)) {
-		    result.append(token);
+		    result.append(stemmer.stem(token));
 		    result.append(WORDSEPARATOR);
 		}
 	    }
