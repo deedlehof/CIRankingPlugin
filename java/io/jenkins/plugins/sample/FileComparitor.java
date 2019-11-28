@@ -12,6 +12,7 @@ public class FileComparitor {
     //when doing a lookup to tell if cached files are updated
     public static final String FILE_EXT = ".occ"; 
     private static final int READ_LINES = 50;
+    private static final String SEP_REPLACER = "//";
 
     public final String cacheDirectory;
     private ImportantWordsGenerator importantWrdGen = ImportantWordsGenerator.INSTANCE;
@@ -67,7 +68,6 @@ public class FileComparitor {
 	//If file doesn't exist, stop
 	if (!file.exists()) { return; }
 
-
 	Map<String, Integer> occurrences = new HashMap<String, Integer>();
 	BufferedReader fileReader = null;
 	String currLine;
@@ -91,7 +91,7 @@ public class FileComparitor {
 		}
 	    }
 	} catch (IOException e) {
-	    System.err.println("Unable to track file: " + file.getAbsolutePath());
+	    System.err.println("Unable to track " + file.getAbsolutePath());
 	} finally {
 	    //Close fileReader 
 	    try {
@@ -102,6 +102,31 @@ public class FileComparitor {
 		ex.printStackTrace();
 	    }
 	}
+	BufferedWriter fileWriter = null;
+	//Replace all file separators with someting that won't be
+	//interpreted as such '//'
+	String niceFilePath = file.getAbsolutePath().replaceAll(File.separator, SEP_REPLACER);
+	try {
+	    fileWrite = new BufferedWriter(new FileWriter(cacheDirectory + File.separator + niceFilePath));
+	    //Write all unique occurrences and number to file
+	    for (Map.Entry<String, Integer> occurrence: occurrences.entrySet()) {
+		fileWrite.write(occurrence.getKey() + " " + occurrence.getValue());
+		fileWrite.newLine();
+	    }
+	} catch (IOException e) {
+	    System.err.println("Unable to cache occurrences for " + file.getAbsolutePath());
+	} finally {
+	    //Close fileWriter
+	    try {
+		if (fileWriter != null) {
+		    fileWriter.close();
+		}
+	    } catch (IOException ex) {
+		ex.printStackTrace();
+	    }
+	}
+	//Add file to tracking list
+	trackedFiles.put(file.getAbsolutePath(), file.lastModified());
     }
 
     public void compare(String text, int results) {
@@ -123,11 +148,25 @@ public class FileComparitor {
 	int pathExtLen = FILE_EXT.length() + 1;
 	
 	for (File occFile: occFiles) {
-	    String occFileAbsPath = occFile.getAbsolutePath();
-	    trackedFiles.put(
-		    occFileAbsPath.substring(0, occFileAbsPath.length() - pathExtLen),
-		    occFile.lastModified()
-	    );
+	    //occFile name is path with .occ extension added and file separators replaced with '//'
+	    //Reverse process to get original file path
+	    String cleanedFilePath = occFile.getName().substring(0, occFileAbsPath.length() - pathExtLen);
+	    String originalPath = cleanedFilePath.replaceAll(SEP_REPLACER, File.separator);
+	    File originalFile = new File(originalPath);
+	    //Check if file is still part of the project
+	    if (originalFile.exists()) {
+		trackedFiles.put(
+			originalPath,
+			originalFile.lastModified() 
+		);
+	    } else {
+		//If file is no longer part of project then delete .occ file for it
+		try {
+		    occFile.delete();
+		} catch (SecurityException e) {
+		    System.err.println("Deletion of redundant file " + occFile.getAbsolutePath() + " failed");
+		}
+	    }
 	}
     }
 
