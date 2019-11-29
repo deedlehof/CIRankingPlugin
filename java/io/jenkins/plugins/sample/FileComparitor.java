@@ -83,7 +83,7 @@ public class FileComparitor {
 		fileTextChunk.append(currLine);
 		lineNum += 1;
 		//If lineNum is multiple of READ_LINES then process chunk
-		if (lineNum % READ_LINES) {
+		if (lineNum % READ_LINES == 0) {
 		    //Extend the current occurrences with important words from this chunk
 		    importantWrdGen.extendGeneration(fileTextChunk.toString(), occurrences);
 		    //Reset the StringBuilder buffer to 0
@@ -102,16 +102,17 @@ public class FileComparitor {
 		ex.printStackTrace();
 	    }
 	}
+	//Write the occurrences to a .occ file
 	BufferedWriter fileWriter = null;
 	//Replace all file separators with someting that won't be
 	//interpreted as such '//'
 	String niceFilePath = file.getAbsolutePath().replaceAll(File.separator, SEP_REPLACER);
 	try {
-	    fileWrite = new BufferedWriter(new FileWriter(cacheDirectory + File.separator + niceFilePath));
+	    fileWriter = new BufferedWriter(new FileWriter(cacheDirectory + File.separator + niceFilePath+ FILE_EXT));
 	    //Write all unique occurrences and number to file
 	    for (Map.Entry<String, Integer> occurrence: occurrences.entrySet()) {
-		fileWrite.write(occurrence.getKey() + " " + occurrence.getValue());
-		fileWrite.newLine();
+		fileWriter.write(occurrence.getKey() + " " + occurrence.getValue());
+		fileWriter.newLine();
 	    }
 	} catch (IOException e) {
 	    System.err.println("Unable to cache occurrences for " + file.getAbsolutePath());
@@ -129,8 +130,65 @@ public class FileComparitor {
 	trackedFiles.put(file.getAbsolutePath(), file.lastModified());
     }
 
-    public void compare(String text, int results) {
-	//compare each .occ file to text and return top results number results
+    //TODO CHECK .OCC FILES FOR NEEDED UPDATES
+    public Map<String, Double> compare(String text, int results) {
+	//Compare each .occ file to text and return top results number results
+	//Comparison using cosine similarity
+	//(A * B) / (|A| * |B|)
+	
+	Map<String, Integer> textImpWrds = importantWrdGen.generate(text);	
+	//Generate the magnitude of the given text
+	int textOccNorm = 0;	
+	for (int val: textImpWrds.values()) {
+	    textOccNorm += val * val;
+	}
+	//Magnitude of text occurrence map
+	double textOccMag = Math.sqrt(textOccNorm); //A
+
+
+	//Read from all .occ files
+	//Generate comparison score against text
+	File folder = new File(cacheDirectory);
+	File[] files = folder.listFiles();
+	BufferedReader fileReader = null;
+	ScoreBoard topScorers = new ScoreBoard(results);
+	for (File file: files) {
+	    try {
+		fileReader = new BufferedReader(new FileReader(file));
+		//The magnitude of the current occ file
+		int occFileNorm = 0;	//B
+		int dotProduct = 0;	
+		String currLine;
+		int wrdOccurrence;
+		//Each line contains one word and its occurrence number
+		while ((currLine = fileReader.readLine()) != null) {
+		    String[] parts = currLine.split(" ");
+		    try {
+			wrdOccurrence = Integer.parseInt(parts[1]);
+		    } catch (NumberFormatException ne) {
+			System.err.println("Unable to parse line \"" + currLine + "\" of file " + file.getName());
+			wrdOccurrence = 0;
+		    }
+		    occFileNorm += wrdOccurrence * wrdOccurrence;
+		    dotProduct += wrdOccurrence * textImpWrds.getOrDefault(parts[0], 0);
+		}
+
+		double fileScore = dotProduct / (textOccNorm * Math.sqrt(occFileNorm));
+		//TODO REPLACE WITH ACTUAL FILE NAME
+		topScorers.insert(file.getName(), fileScore);
+	    } catch (IOException e) {
+		System.err.println("Unable to consider " + file.getName() + " in comparison");
+	    } finally {
+		try {
+		    if (fileReader != null) {
+			fileReader.close();
+		    }
+		} catch (IOException ex) {
+		    ex.printStackTrace();
+		}
+	    }
+	}
+	return topScorers.getElemsAsMap();
     }
 
     private void initializeTracker(String directory) {
@@ -144,13 +202,13 @@ public class FileComparitor {
 		return name.toLowerCase().endsWith(FILE_EXT);
 	    }
 	});
-	//File extension length (plus period).  Used to remove file extension
-	int pathExtLen = FILE_EXT.length() + 1;
+	//File extension length.  Used to remove file extension
+	int pathExtLen = FILE_EXT.length();
 	
 	for (File occFile: occFiles) {
 	    //occFile name is path with .occ extension added and file separators replaced with '//'
 	    //Reverse process to get original file path
-	    String cleanedFilePath = occFile.getName().substring(0, occFileAbsPath.length() - pathExtLen);
+	    String cleanedFilePath = occFile.getName().substring(0, occFile.getName().length() - pathExtLen);
 	    String originalPath = cleanedFilePath.replaceAll(SEP_REPLACER, File.separator);
 	    File originalFile = new File(originalPath);
 	    //Check if file is still part of the project
