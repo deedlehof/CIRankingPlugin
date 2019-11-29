@@ -12,7 +12,7 @@ public class FileComparitor {
     //when doing a lookup to tell if cached files are updated
     public static final String FILE_EXT = ".occ"; 
     private static final int READ_LINES = 50;
-    private static final String SEP_REPLACER = "//";
+    private static final String SEP_REPLACER = "%";
 
     public final String cacheDirectory;
     private ImportantWordsGenerator importantWrdGen = ImportantWordsGenerator.INSTANCE;
@@ -31,6 +31,7 @@ public class FileComparitor {
 	if (cacheDirFile.exists() && cacheDirFile.isDirectory()) {
 	    initializeTracker(cacheDirectory);
 	} else {
+	    System.err.println("Creating caching directory..."); //TODO REMOVE
 	    cacheDirFile.mkdir();
 	}
     }
@@ -90,6 +91,10 @@ public class FileComparitor {
 		    fileTextChunk.setLength(0);
 		}
 	    }
+	    if (fileTextChunk.length() > 0) {
+		//Extend the current occurrences with important words from the final chunk
+		importantWrdGen.extendGeneration(fileTextChunk.toString(), occurrences);
+	    }
 	} catch (IOException e) {
 	    System.err.println("Unable to track " + file.getAbsolutePath());
 	} finally {
@@ -104,11 +109,13 @@ public class FileComparitor {
 	}
 	//Write the occurrences to a .occ file
 	BufferedWriter fileWriter = null;
-	//Replace all file separators with someting that won't be
-	//interpreted as such '//'
-	String niceFilePath = file.getAbsolutePath().replaceAll(File.separator, SEP_REPLACER);
+	//Replace all file separators with something that won't be
+	//interpreted as such 
+	String niceFilePath = file.getAbsolutePath().substring(1).replaceAll(File.separator, SEP_REPLACER);
+	String completePath = cacheDirectory + File.separator + niceFilePath + FILE_EXT;
+	System.err.println(completePath); //TODO REMOVE
 	try {
-	    fileWriter = new BufferedWriter(new FileWriter(cacheDirectory + File.separator + niceFilePath+ FILE_EXT));
+	    fileWriter = new BufferedWriter(new FileWriter(completePath));
 	    //Write all unique occurrences and number to file
 	    for (Map.Entry<String, Integer> occurrence: occurrences.entrySet()) {
 		fileWriter.write(occurrence.getKey() + " " + occurrence.getValue());

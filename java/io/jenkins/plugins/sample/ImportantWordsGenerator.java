@@ -73,6 +73,7 @@ public class ImportantWordsGenerator {
 	    //Split a token by Capital letters
 	    String[] subTokens = StringUtils.splitByCharacterTypeCamelCase(token);
 	    for (String subToken: subTokens) {
+		subToken = subToken.toLowerCase();
 		//If the subToken isn't a stopword, then add it to occurrences
 		if (!stopWords.contains(subToken)) {
 		    //stem the word
@@ -83,6 +84,7 @@ public class ImportantWordsGenerator {
 	    }
 	    //Add the original token if it was broken up
 	    if (subTokens.length > 1) {
+		token = token.toLowerCase();
 		//If the token isn't a stopword, then add it to result
 		if (!stopWords.contains(token)) {
 		    //stem the word

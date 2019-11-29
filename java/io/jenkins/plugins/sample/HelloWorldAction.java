@@ -7,8 +7,7 @@ import java.util.Map;
 
 public class HelloWorldAction implements RunAction2 {
   
-    private transient ImportantWordsGenerator importantWordsGen =
-	ImportantWordsGenerator.INSTANCE;
+    private transient FileComparitor fc;
 
     private int bugIndex;
     private String files;
@@ -27,7 +26,14 @@ public class HelloWorldAction implements RunAction2 {
 	report = bugReportInfo.get("report");
 	codeLocation = tp.checkoutCodeVersion(index);
 
-	Map<String, Integer> words = importantWordsGen.generate("This is a test setence.");
+	fc = new FileComparitor("test");
+	fc.trackFile("/home/tanner/School/616/TestFiles/file1");
+	
+	Map<String, Double> matchedFiles = fc.compare("compare word docs", 1);
+	
+	for (Map.Entry<String, Double> file: matchedFiles.entrySet()) {
+	    System.err.println(file.getKey() + " \t" + file.getValue());
+	}
     }
 
     public String getName() {
