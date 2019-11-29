@@ -17,10 +17,9 @@ public class FileComparitor {
     public final String cacheDirectory;
     private ImportantWordsGenerator importantWrdGen = ImportantWordsGenerator.INSTANCE;
     //Contains all tracked files and their lastModified date
-    private Map<String, Long> trackedFiles= new HashMap<String, Long>();
+    private Map<String, Long> trackedFiles = new HashMap<String, Long>();
 
     //Creates a new comparitor that caches files in directory
-    //TODO change directory to absolute instead of relative?
     public FileComparitor(String directory) {
 	cacheDirectory = System.getProperty("user.home") + File.separator + ".BugRanking" + 
 	    File.separator + directory;
@@ -31,7 +30,7 @@ public class FileComparitor {
 	if (cacheDirFile.exists() && cacheDirFile.isDirectory()) {
 	    initializeTracker(cacheDirectory);
 	} else {
-	    System.err.println("Creating caching directory..."); //TODO REMOVE
+	    System.err.println("Creating caching directory..."); 
 	    cacheDirFile.mkdir();
 	}
     }
@@ -53,7 +52,12 @@ public class FileComparitor {
 
 	for (File file: files) {
 	    if (file.isFile()) {
-		trackFile(file);
+		//Check if file is already tracked and updated
+		//If not then update it
+		if (trackedFiles.getOrDefault(fileToOccName(file.getAbsolutePath()), 0L) < 
+			file.lastModified()) {
+		    trackFile(file);
+		}
 	    } else if (file.isDirectory()) {
 		trackDirectory(file);
 	    }
@@ -111,9 +115,8 @@ public class FileComparitor {
 	BufferedWriter fileWriter = null;
 	//Replace all file separators with something that won't be
 	//interpreted as such 
-	String niceFilePath = file.getAbsolutePath().substring(1).replaceAll(File.separator, SEP_REPLACER);
-	String completePath = cacheDirectory + File.separator + niceFilePath + FILE_EXT;
-	System.err.println(completePath); //TODO REMOVE
+	String occName = fileToOccName(file.getAbsolutePath());
+	String completePath = cacheDirectory + File.separator + occName;
 	try {
 	    fileWriter = new BufferedWriter(new FileWriter(completePath));
 	    //Write all unique occurrences and number to file
@@ -134,7 +137,7 @@ public class FileComparitor {
 	    }
 	}
 	//Add file to tracking list
-	trackedFiles.put(file.getAbsolutePath(), file.lastModified());
+	trackedFiles.put(occName, file.lastModified());
     }
 
     //TODO CHECK .OCC FILES FOR NEEDED UPDATES
@@ -158,8 +161,14 @@ public class FileComparitor {
 	File folder = new File(cacheDirectory);
 	File[] files = folder.listFiles();
 	BufferedReader fileReader = null;
+	//Keeps the top 'results' number file scores
 	ScoreBoard topScorers = new ScoreBoard(results);
 	for (File file: files) {
+	    //Update .occ file is its been modified since last tracking
+	    File originalFile = new File(occToFileName(file.getName()));
+	    if (trackedFiles.getOrDefault(file.getName(), 0L) < originalFile.lastModified()) {
+		trackFile(originalFile);
+	    }
 	    try {
 		fileReader = new BufferedReader(new FileReader(file));
 		//The magnitude of the current occ file
@@ -173,16 +182,18 @@ public class FileComparitor {
 		    try {
 			wrdOccurrence = Integer.parseInt(parts[1]);
 		    } catch (NumberFormatException ne) {
-			System.err.println("Unable to parse line \"" + currLine + "\" of file " + file.getName());
+			System.err.println("Unable to parse line \"" + currLine + "\" of file " + 
+				file.getName());
 			wrdOccurrence = 0;
 		    }
 		    occFileNorm += wrdOccurrence * wrdOccurrence;
 		    dotProduct += wrdOccurrence * textImpWrds.getOrDefault(parts[0], 0);
 		}
 
+		//Calculate and save fileScore
 		double fileScore = dotProduct / (textOccNorm * Math.sqrt(occFileNorm));
-		//TODO REPLACE WITH ACTUAL FILE NAME
-		topScorers.insert(file.getName(), fileScore);
+		//Score is saved if it is in top 'results' number of elements
+		topScorers.insert(occToFileName(file.getName()), fileScore);
 	    } catch (IOException e) {
 		System.err.println("Unable to consider " + file.getName() + " in comparison");
 	    } finally {
@@ -209,19 +220,15 @@ public class FileComparitor {
 		return name.toLowerCase().endsWith(FILE_EXT);
 	    }
 	});
-	//File extension length.  Used to remove file extension
-	int pathExtLen = FILE_EXT.length();
 	
 	for (File occFile: occFiles) {
-	    //occFile name is path with .occ extension added and file separators replaced with '//'
-	    //Reverse process to get original file path
-	    String cleanedFilePath = occFile.getName().substring(0, occFile.getName().length() - pathExtLen);
-	    String originalPath = cleanedFilePath.replaceAll(SEP_REPLACER, File.separator);
-	    File originalFile = new File(originalPath);
+	    //occFile name is path with .occ extension added and file separators replaced
+	    //Reverse process to get original file
+	    File originalFile = new File(occToFileName(occFile.getName()));
 	    //Check if file is still part of the project
 	    if (originalFile.exists()) {
 		trackedFiles.put(
-			originalPath,
+			occFile.getName(),
 			originalFile.lastModified() 
 		);
 	    } else {
@@ -233,6 +240,15 @@ public class FileComparitor {
 		}
 	    }
 	}
+    }
+
+    private String fileToOccName(String name) {
+	return name.substring(1).replaceAll(File.separator, SEP_REPLACER) + FILE_EXT;
+    }
+
+    private String occToFileName(String name) {
+	String cleanedFilePath = name.substring(0, name.length() - FILE_EXT.length());
+	return cleanedFilePath.replaceAll(SEP_REPLACER, File.separator);
     }
 
 }

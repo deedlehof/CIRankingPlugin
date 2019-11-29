@@ -26,13 +26,10 @@ public class HelloWorldAction implements RunAction2 {
 	report = bugReportInfo.get("report");
 	codeLocation = tp.checkoutCodeVersion(index);
 
-	fc = new FileComparitor("test");
-	//fc.trackFile("/home/tanner/School/616/TestFiles/file1");
-	//fc.trackFile("/home/tanner/School/616/TestFiles/file2");
-	//fc.trackDirectory("/home/tanner/School/616/TestFiles");
-	fc.trackDirectory("/tmp/Lang1/src/main/java/org/apache/commons/lang3/builder");
+	fc = new FileComparitor("Lang");
+	fc.trackDirectory("/tmp/Lang1/src/main/java/org/apache/commons/lang3");
 
-	ScoreBoard matchedFiles = fc.compare("compare word docs", 5);
+	ScoreBoard matchedFiles = fc.compare("an exception won't be thrown for null array input", 5);
 	System.err.println("=======TOP MATCHING FILES=========");
 	System.err.println(matchedFiles);
     }
