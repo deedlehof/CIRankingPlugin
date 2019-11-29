@@ -27,13 +27,14 @@ public class HelloWorldAction implements RunAction2 {
 	codeLocation = tp.checkoutCodeVersion(index);
 
 	fc = new FileComparitor("test");
-	fc.trackFile("/home/tanner/School/616/TestFiles/file1");
-	
-	Map<String, Double> matchedFiles = fc.compare("compare word docs", 1);
-	
-	for (Map.Entry<String, Double> file: matchedFiles.entrySet()) {
-	    System.err.println(file.getKey() + " \t" + file.getValue());
-	}
+	//fc.trackFile("/home/tanner/School/616/TestFiles/file1");
+	//fc.trackFile("/home/tanner/School/616/TestFiles/file2");
+	//fc.trackDirectory("/home/tanner/School/616/TestFiles");
+	fc.trackDirectory("/tmp/Lang1/src/main/java/org/apache/commons/lang3/builder");
+
+	ScoreBoard matchedFiles = fc.compare("compare word docs", 5);
+	System.err.println("=======TOP MATCHING FILES=========");
+	System.err.println(matchedFiles);
     }
 
     public String getName() {

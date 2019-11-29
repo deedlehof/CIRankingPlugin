@@ -31,6 +31,7 @@ public class ScoreBoard {
 		//If list is too long now, remove lowest element
 		if (length > maxLength) {
 		    elements.removeLast();
+		    length -= 1;
 		}
 		return true;
 	    }

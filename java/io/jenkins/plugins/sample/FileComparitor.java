@@ -138,7 +138,7 @@ public class FileComparitor {
     }
 
     //TODO CHECK .OCC FILES FOR NEEDED UPDATES
-    public Map<String, Double> compare(String text, int results) {
+    public ScoreBoard compare(String text, int results) {
 	//Compare each .occ file to text and return top results number results
 	//Comparison using cosine similarity
 	//(A * B) / (|A| * |B|)
@@ -195,7 +195,7 @@ public class FileComparitor {
 		}
 	    }
 	}
-	return topScorers.getElemsAsMap();
+	return topScorers;
     }
 
     private void initializeTracker(String directory) {
