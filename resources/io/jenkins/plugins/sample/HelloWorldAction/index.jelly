@@ -5,27 +5,15 @@
 	    <st:include page="sidepanel.jelly" it="${it.run}" optional="true" />
 	</l:side-panel>
         <l:main-panel> 
-            <h1> 
-                Project: ${it.name}   
-            </h1>
-	    <h2>
-		Bug: ${it.bugIndex}
-	    </h2>
-	    <p>
-		<b>URL: </b>${it.URL}
-	    </p>
-	    <p>
-		<b>Affected File(s): </b>${it.files}
-	    </p>
 	    <p>
 		<b>Code Location: </b>${it.codeLocation}
 	    </p>
-	    <p>
-		<b>Report: </b>
-	    </p>
-	    <p>
-		${it.report}
-	    </p>
+	    <h3>Top Results</h3>
+	    <j:forEach var="item" items="${it.fileLabels}">
+		<li>
+		    <p>"${item}"</p>
+		</li>
+	    </j:forEach>
         </l:main-panel>
     </l:layout>
 </j:jelly>

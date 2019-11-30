@@ -45,6 +45,14 @@ public class ScoreBoard {
 	return false;
     }
 
+    public String[] getLabels() {
+	String[] labels = new String[length];
+	for (int i = 0; i < length; i += 1) {
+	    labels[i] = elements.get(i).label;
+	}
+	return labels;
+    }
+
     public List<BoardElement> getBoardElements() {
 	return elements;
     }

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.lang.StringBuilder;
 
-public class FileComparitor {
+public class FileComparator {
     
     //TODO IMPORTANT NOTE File.lastModified()
     //compare that to cahced info
@@ -19,8 +19,8 @@ public class FileComparitor {
     //Contains all tracked files and their lastModified date
     private Map<String, Long> trackedFiles = new HashMap<String, Long>();
 
-    //Creates a new comparitor that caches files in directory
-    public FileComparitor(String directory) {
+    //Creates a new comparator that caches files in directory
+    public FileComparator(String directory) {
 	cacheDirectory = System.getProperty("user.home") + File.separator + ".BugRanking" + 
 	    File.separator + directory;
 	//Check if the caching directory exists

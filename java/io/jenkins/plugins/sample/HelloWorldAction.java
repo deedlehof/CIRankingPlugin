@@ -7,59 +7,35 @@ import java.util.Map;
 
 public class HelloWorldAction implements RunAction2 {
   
-    private transient FileComparitor fc;
-
-    private int bugIndex;
-    private String files;
-    private String url;
-    private String report;
-    private String codeLocation;
+    private transient FileComparator fc;
+    private transient ScoreBoard matchedFiles;
     private transient Run run;
-    private transient TestProgram tp;
 
-    public HelloWorldAction(int index) {
-	bugIndex = index;
-	tp = new TestProgram("Lang");
-	Map<String, String> bugReportInfo = tp.getBugInformation(bugIndex);
-	files = bugReportInfo.get("files");
-	url = bugReportInfo.get("url");
-	report = bugReportInfo.get("report");
-	codeLocation = tp.checkoutCodeVersion(index);
+    private String codeLocation;
+    private String bugReport; 
 
-	fc = new FileComparitor("Lang");
-	fc.trackDirectory("/tmp/Lang1/src/main/java/org/apache/commons/lang3");
+    public HelloWorldAction(String codeLocation, String bugReport) {
+	this.codeLocation = codeLocation;
+	this.bugReport = bugReport;
 
-	ScoreBoard matchedFiles = fc.compare("an exception won't be thrown for null array input", 5);
+	fc = new FileComparator("Lang");
+	fc.trackDirectory(codeLocation);
+
+	matchedFiles = fc.compare(bugReport, 5);
 	System.err.println("=======TOP MATCHING FILES=========");
 	System.err.println(matchedFiles);
-    }
-
-    public String getName() {
-	return tp.getID();
-	//return tp.testMeth();
-	//return Integer.toString(tp.getNumOfBugs());
-	//return tp.getBugInformation(1).get("report");
-	//return tp.checkoutCodeVersion(1);
-    }
-
-    public String getFiles() {
-	return files;
-    }
-
-    public String getURL() {
-	return url;
-    }
-
-    public String getReport() {
-	return report;
     }
 
     public String getCodeLocation() {
 	return codeLocation;
     }
 
-    public int getBugIndex() {
-	return bugIndex;
+    public ScoreBoard getMatchedFiles() {
+	return matchedFiles;
+    }
+
+    public String[] getFileLabels() {
+	return matchedFiles.getLabels();
     }
 
     @Override

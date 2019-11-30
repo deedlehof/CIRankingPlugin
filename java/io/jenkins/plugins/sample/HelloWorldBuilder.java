@@ -20,41 +20,44 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 public class HelloWorldBuilder extends Builder implements SimpleBuildStep {
 
-    private final String name;
-    private int bugIndex;
+    private String codeLocation;
+    private String bugReport;
 
     @DataBoundConstructor
-    public HelloWorldBuilder(String name) {
-        this.name = name;
+    public HelloWorldBuilder(String codeLocation, String bugReport) {
+	this.codeLocation = codeLocation;
+	this.bugReport = bugReport;
     }
 
-    public String getName() {
-        return name;
+    public String getCodeLocation() {
+        return codeLocation;
+    }
+    
+    public String getBugReport() {
+        return bugReport;
     }
 
     @DataBoundSetter
-    public void setBugIndex(int bugIndex) {
-        this.bugIndex = bugIndex;
+    public void setCodeLocation(String codeLocation) {
+        this.codeLocation = codeLocation;
+    }
+    
+    @DataBoundSetter
+    public void setBugReport(String bugReport) {
+        this.bugReport = bugReport;
     }
 
     @Override
     public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-        run.addAction(new HelloWorldAction(bugIndex));
-	/*
-	if (useFrench) {
-            listener.getLogger().println("Bonjour, " + name + "!");
-        } else {
-            listener.getLogger().println("Hello, " + name + "!");
-        }
-	*/
+        run.addAction(new HelloWorldAction(codeLocation, bugReport));
     }
 
     @Symbol("greet")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-        public FormValidation doCheckName(@QueryParameter String value, @QueryParameter int bugIndex)
-                throws IOException, ServletException {
+        public FormValidation doCheckName(@QueryParameter String codeLocation, 
+		@QueryParameter String bugReport) throws IOException, ServletException {
             return FormValidation.ok();
         }
 
@@ -65,7 +68,7 @@ public class HelloWorldBuilder extends Builder implements SimpleBuildStep {
 
         @Override
         public String getDisplayName() {
-            return Messages.HelloWorldBuilder_DescriptorImpl_DisplayName();
+            return "Bug Report";
         }
 
     }
