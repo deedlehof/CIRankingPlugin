@@ -1,0 +1,37 @@
+README
+The included code is the source, minus supporting infrastructure for a Jenkins plug-in.
+For this to work on your own computer you need a few things.
+
+First, the project layout for a Jenkins plug-in.
+Follow the instructions from the Jenkins' site on how to set that up.
+https://jenkins.io/doc/developer/tutorial/prepare/
+This will walk you through installing the JDK and Maven in the first step.
+In the second step, follow the instructions and use the following when prompted.
+groupId: io.jenkens.plugins.sample
+artifactId: ranked-bug-files
+The rest can be left as defaults.
+Before running in step 3, go to the ranked-bug-files/src/main directory.
+Once there, delete the java and resources directories.
+Clone the source files from this github repo into that directory.
+Move the pom.xml and stop_words.txt out two layers to the ranked-bug-files folder and replace
+the pom.xml there.
+The project should now be ready to run using 'mvn hpi:run' in the ranked-bug-files
+directory.
+To see the jenkins plugin navigate to a web browser and go to the following address.
+http://localhost:8080/jenkins/
+
+Now, the plugin is working, but unless you have a project already in mind to point it
+at then you'll need one other thing and that's code with bug reports.  I used
+the Defects4J command line tool for testing purposes.
+https://github.com/rjust/defects4j
+This page includes instructions on how to install the tool and run it.
+You'll need to checkout a buggy project to the directory of your chosing.
+Also, you'll need to get the bug information for the source code you obtained.
+Both things are laid out under 'Using Defect4J' on the site.
+
+Finally, to test the plugin create a new freestyle project in Jenkins.
+Go to the build configure page and you should see a section for my plug-in.
+Enter the directory of the source code you want to be searched.
+Enter the bug report for the bug you wish to find.
+Now, when you build the plugin navigate to the Bug Ranking section.
+Listed there is the top 5 matching source files for the bug report.

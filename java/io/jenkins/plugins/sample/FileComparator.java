@@ -7,9 +7,6 @@ import java.lang.StringBuilder;
 
 public class FileComparator {
     
-    //TODO IMPORTANT NOTE File.lastModified()
-    //compare that to cahced info
-    //when doing a lookup to tell if cached files are updated
     public static final String FILE_EXT = ".occ"; 
     private static final int READ_LINES = 50;
     private static final String SEP_REPLACER = "%";
@@ -21,7 +18,7 @@ public class FileComparator {
 
     //Creates a new comparator that caches files in directory
     public FileComparator(String directory) {
-	cacheDirectory = System.getProperty("user.home") + File.separator + ".BugRanking" + 
+	cacheDirectory = System.getProperty("user.dir") + File.separator + ".BugRanking" + 
 	    File.separator + directory;
 	//Check if the caching directory exists
 	//If it does then intialize trackedFiles

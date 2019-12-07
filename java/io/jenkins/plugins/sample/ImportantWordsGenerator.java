@@ -25,7 +25,7 @@ public class ImportantWordsGenerator {
 
     private ImportantWordsGenerator() {
 	String fileSep = File.separator;
-	STOPWORDSFILE = System.getProperty("user.home") + fileSep + ".BugRanking" + fileSep + "stop_words.txt";
+	STOPWORDSFILE = System.getProperty("user.dir") + fileSep + "stop_words.txt";
 	
 	tokenizer = SimpleTokenizer.INSTANCE;
 	stemmer = new PorterStemmer();
@@ -34,7 +34,6 @@ public class ImportantWordsGenerator {
 	stopWords = new HashSet<String>();
 	BufferedReader stpWrdReader = null;
 	try {
-	    System.err.println(System.getProperty("user.home"));
 	    System.err.println("Stop Words File: " + STOPWORDSFILE);
 	    String currStpWrd;
 	    stpWrdReader = new BufferedReader(new FileReader(STOPWORDSFILE));
