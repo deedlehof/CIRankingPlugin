@@ -1,69 +1,68 @@
 package io.jenkins.plugins.sample;
 
-//import hudson.model.Action;
+// import hudson.model.Action;
 import hudson.model.Run;
 import jenkins.model.RunAction2;
-import java.util.Map;
 
 public class HelloWorldAction implements RunAction2 {
-  
-    private transient FileComparator fc;
-    private transient ScoreBoard matchedFiles;
-    private transient Run run;
 
-    private String codeLocation;
-    private String bugReport; 
+  private transient FileComparator fc;
+  private transient ScoreBoard matchedFiles;
+  private transient Run run;
 
-    public HelloWorldAction(String codeLocation, String bugReport) {
-	this.codeLocation = codeLocation;
-	this.bugReport = bugReport;
+  private String codeLocation;
+  private String bugReport;
 
-	fc = new FileComparator("Lang");
-	fc.trackDirectory(codeLocation);
+  public HelloWorldAction(String codeLocation, String bugReport) {
+    this.codeLocation = codeLocation;
+    this.bugReport = bugReport;
 
-	matchedFiles = fc.compare(bugReport, 5);
-	System.err.println("=======TOP MATCHING FILES=========");
-	System.err.println(matchedFiles);
-    }
+    fc = new FileComparator("Lang");
+    fc.trackDirectory(codeLocation);
 
-    public String getCodeLocation() {
-	return codeLocation;
-    }
+    matchedFiles = fc.compare(bugReport, 5);
+    System.err.println("=======TOP MATCHING FILES=========");
+    System.err.println(matchedFiles);
+  }
 
-    public ScoreBoard getMatchedFiles() {
-	return matchedFiles;
-    }
+  public String getCodeLocation() {
+    return codeLocation;
+  }
 
-    public String[] getFileLabels() {
-	return matchedFiles.getLabels();
-    }
+  public ScoreBoard getMatchedFiles() {
+    return matchedFiles;
+  }
 
-    @Override
-    public void onAttached(Run<?, ?> run) {
-	this.run = run;
-    }
+  public String[] getFileLabels() {
+    return matchedFiles.getLabels();
+  }
 
-    @Override
-    public void onLoad(Run<?, ?> run) {
-	this.run = run;
-    }
+  @Override
+  public void onAttached(Run<?, ?> run) {
+    this.run = run;
+  }
 
-    public Run getRun() {
-	return run;
-    }
+  @Override
+  public void onLoad(Run<?, ?> run) {
+    this.run = run;
+  }
 
-    @Override
-    public String getIconFileName() {
-	return "document.png";
-    }
+  public Run getRun() {
+    return run;
+  }
 
-    @Override
-    public String getDisplayName() {
-	return "Bug Ranking";
-    }
+  @Override
+  public String getIconFileName() {
+    return "document.png";
+  }
 
-    @Override
-    public String getUrlName() {
-	return "bugranking";
-    }
+  @Override
+  public String getDisplayName() {
+    return "Bug Ranking";
+  }
+
+  @Override
+  public String getUrlName() {
+    return "bugranking";
+  }
 }
