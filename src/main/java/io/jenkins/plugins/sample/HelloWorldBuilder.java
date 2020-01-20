@@ -63,7 +63,7 @@ public class HelloWorldBuilder extends Builder implements SimpleBuildStep {
     }
 
     @Override
-    public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+    public boolean isApplicable(Class<? extends AbstractProject> testClass) {
       return true;
     }
 

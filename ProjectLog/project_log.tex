@@ -1,0 +1,45 @@
+\documentclass[]{article}
+
+\usepackage{titlesec}
+\usepackage[margin=1in]{geometry}
+
+\newenvironment{logentry}[2]% date, heading
+{\noindent\vspace{.2cm}\large\textbf{#2}\titlerule\large\textbf{#1}}
+{\\\\\\\vspace{5cm}}
+
+\begin{document}
+\begin{logentry}{01/20/20}{{\LaTeX}, Google Format, and DE}
+    \par The first week after officially starting my project has been busy.
+    I started with trying to improve my development environment in the 
+    hopes that it will make writing the project easier.  I'm using vim
+    for all of my development.  Vim has a lot of nice plugins that I've 
+    added to make my life easier.  For example, Ultisnips which allows
+    for the creation and insertion of code snippets to streamline
+    coding and prevent you from writing the same thing over and
+    over again.
+    \par Once I was mostly happy with my setup, I turned my attention
+    to my project.  I've written a good chunk of code already for it
+    from when I was in CS616, but it needed some work.  I spent some
+    time cleaning up what was already there and making the project more
+    concise.  For example, I was caching the important words from each of 
+    the scanned source files in my home directory, so I moved it to the root
+    of the project structure instead.  I also moved my git out a level so that
+    I could include the testing directory - a future project, along with other
+    fixes.
+    \par The biggest fix to my code was formatting.  I had my own internalized 
+    style when writing, so it was fairly consistent, but it wasn't perfect.
+    While figuring out my DE I added a plugin for linting and got it working
+    for the project's language - Java.  I went through and updated all of my
+    code to follow Google's standard for Java development, minus their rule
+    on tabs.  The indentation is correct, but I'm a fan of tabs over spaces 
+    as all sane humans should be.  All that's left for that is writing the
+    Javadoc comments.  Once that's complete it'll all be compliant.
+    \par The last thing I worked on was learning {\LaTeX}. In all my
+    time at university I've never sat down to learn {\LaTeX}, but with
+    such a long term writing project - these logs - I decided
+    to invest the time and I can already tell it was a good choice.
+    {\LaTeX} is very powerful and I've got it automated with plugins 
+    Ultisnips and vimtex, so that it is extremely easy to update when I make 
+    changes to the project.
+\end{logentry}
+\end{document}

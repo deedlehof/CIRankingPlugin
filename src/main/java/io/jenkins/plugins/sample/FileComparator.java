@@ -1,6 +1,12 @@
 package io.jenkins.plugins.sample;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,11 +24,7 @@ public class FileComparator {
   // Creates a new comparator that caches files in directory
   public FileComparator(String directory) {
     cacheDirectory =
-        System.getProperty("user.dir")
-            + File.separator
-            + "Cache"
-            + File.separator
-            + directory;
+        System.getProperty("user.dir") + File.separator + "Cache" + File.separator + directory;
     // Check if the caching directory exists
     // If it does then intialize trackedFiles
     // If not then create the directory

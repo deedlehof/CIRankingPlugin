@@ -15,9 +15,7 @@ import org.jsoup.select.Elements;
 
 public class TestProgram {
 
-  public String test; // TODO REMOVE
-
-  private final String ID;
+  private final String identity;
   private ArrayList<String> projectInfo;
   private ArrayList<String> bugInfo;
   private int currentBugID = 1;
@@ -28,10 +26,10 @@ public class TestProgram {
 
   private final String lineDivider = "---------";
 
-  public TestProgram(String ID) {
-    this.ID = ID;
+  public TestProgram(String identity) {
+    this.identity = identity;
     try {
-      projectInfo = runCommand(new String[] {defects4jExecutable, "info", "-p", ID});
+      projectInfo = runCommand(new String[] {defects4jExecutable, "info", "-p", identity});
     } catch (Exception e) {
       /*
       StringWriter errors = new StringWriter();
@@ -43,26 +41,22 @@ public class TestProgram {
     numOfBugs = Integer.parseInt(numBugStr);
   }
 
-  public String testMeth() { // TODO REMOVE
-    return test;
-  }
-
   public String getID() {
-    return ID;
+    return identity;
   }
 
   public int getNumOfBugs() {
     return numOfBugs;
   }
 
-  // checkout buggy code for bug ID
+  // checkout buggy code for bug identity
   // returns code directory name
   public String checkoutCodeVersion(int bugID) {
-    String codeDirectory = srcCodeBaseDir + ID + bugID;
+    String codeDirectory = srcCodeBaseDir + identity + bugID;
     try {
       String[] cmd =
           new String[] {
-            defects4jExecutable, "checkout", "-p", ID, "-v", bugID + "b", "-w", codeDirectory
+            defects4jExecutable, "checkout", "-p", identity, "-v", bugID + "b", "-w", codeDirectory
           };
       runCommand(cmd);
     } catch (Exception e) {
@@ -81,7 +75,7 @@ public class TestProgram {
 
     try {
       String[] cmd =
-          new String[] {defects4jExecutable, "info", "-p", ID, "-b", Integer.toString(index)};
+          new String[] {defects4jExecutable, "info", "-p", identity, "-b", Integer.toString(index)};
       if ((bugInfo = runCommand(cmd)) == null) {
         return null;
       }
@@ -105,11 +99,11 @@ public class TestProgram {
     }
 
     // TODO make compatible with all projects
-    Elements pElems = page.select("div.user-content-block > p");
+    Elements pageElements = page.select("div.user-content-block > p");
 
     StringBuilder report = new StringBuilder();
-    for (Element pElem : pElems) {
-      report.append(pElem.text());
+    for (Element pageElement : pageElements) {
+      report.append(pageElement.text());
     }
     return report.toString();
   }
@@ -154,7 +148,8 @@ public class TestProgram {
     // read output
     ArrayList<String> output = new ArrayList<String>();
     BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    String line = null, previous = null;
+    String line = null;
+    String previous = null;
     while ((line = br.readLine()) != null) {
       if (!line.equals(previous)) {
         previous = line;

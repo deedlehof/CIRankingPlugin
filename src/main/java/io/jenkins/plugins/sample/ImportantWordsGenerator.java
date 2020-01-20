@@ -1,6 +1,10 @@
 package io.jenkins.plugins.sample;
 
-import java.io.*;
+// import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -63,7 +67,7 @@ public class ImportantWordsGenerator {
     // Takes a string input and a map of occurrences
     // Occurrences is a map of unique words with their number of occurrences
     // Convert the input into tokens
-    String tokens[] = tokenizer.tokenize(input);
+    String[] tokens = tokenizer.tokenize(input);
 
     for (String token : tokens) {
       // Split a token by Capital letters
