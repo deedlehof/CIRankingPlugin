@@ -12,6 +12,12 @@ import opennlp.tools.stemmer.PorterStemmer;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import org.apache.commons.lang.StringUtils;
 
+/**
+* ImportantWordsGenerator creates a map of words,
+* not in the stop-words list, that are stemmed
+* and broken into base words, along with the 
+* number of times they occurr in a given string.
+*/
 public class ImportantWordsGenerator {
 
   // Static instance variable
@@ -57,12 +63,27 @@ public class ImportantWordsGenerator {
     }
   }
 
+  /**
+  * Creates a map of unique words and the number of
+  * occurrences from the input string.
+  *
+  * @param input  the string to be processed
+  * @return  a map of words and occurrences
+  */
   public Map<String, Integer> generate(String input) {
     // Map of unique words with occurrence
     Map<String, Integer> occurrences = new HashMap<String, Integer>();
     return extendGeneration(input, occurrences);
   }
 
+  /**
+  * Appends the unique words and number of occurrences
+  * to the given map.
+  *
+  * @param input  the string to be processed
+  * @param occurrences  map of words and number of occurrences
+  * @return  a map of words and occurrences
+  */
   public Map<String, Integer> extendGeneration(String input, Map<String, Integer> occurrences) {
     // Takes a string input and a map of occurrences
     // Occurrences is a map of unique words with their number of occurrences

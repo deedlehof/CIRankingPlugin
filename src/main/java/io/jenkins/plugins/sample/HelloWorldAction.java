@@ -1,9 +1,12 @@
 package io.jenkins.plugins.sample;
 
-// import hudson.model.Action;
 import hudson.model.Run;
 import jenkins.model.RunAction2;
 
+/**
+* HelloWorldAction is responsible for serving
+* data to the plugin front-end.
+*/
 public class HelloWorldAction implements RunAction2 {
 
   private transient FileComparator fc;
@@ -13,6 +16,13 @@ public class HelloWorldAction implements RunAction2 {
   private String codeLocation;
   private String bugReport;
 
+  /**
+  * Creates a new HelloWorldAction that runs the
+  * file comparison for bug reports.
+  *
+  * @param codeLocation  the directory to be tracked
+  * @param bugReport  the bug report to be compared
+  */
   public HelloWorldAction(String codeLocation, String bugReport) {
     this.codeLocation = codeLocation;
     this.bugReport = bugReport;

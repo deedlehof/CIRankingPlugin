@@ -10,6 +10,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+* FileComparitor is the class for tracking source files and
+* generating the top matching files for a given input string.
+* All tracked files are given a cached file of the count
+* of their important words.
+*/
 public class FileComparator {
 
   public static final String FILE_EXT = ".occ";
@@ -21,7 +27,13 @@ public class FileComparator {
   // Contains all tracked files and their lastModified date
   private Map<String, Long> trackedFiles = new HashMap<String, Long>();
 
-  // Creates a new comparator that caches files in directory
+  /**
+  * Creates a new FileComparator that caches the important words
+  * for all of the files found in directory.
+  * Creates the caching directory if it doesn't exist.
+  *
+  * @param directory  the location of the files to be tracked
+  */
   public FileComparator(String directory) {
     cacheDirectory =
         System.getProperty("user.dir") + File.separator + "Cache" + File.separator + directory;
@@ -37,6 +49,15 @@ public class FileComparator {
     }
   }
 
+  /**
+  * Tracks all of the files within directory, recursively
+  * including all files in subdirectories.
+  * All files in the directory and it's subdirectories are
+  * tracked.  A .occ cache file is created for each of the 
+  * files and placed in the caching directory.
+  *
+  * @param directory  the location of the files to be tracked
+  */
   public void trackDirectory(String directory) {
     // Tracks all of the files within the directory (absolute path)
     // Recursive, includes all files in subdirectories
@@ -45,6 +66,16 @@ public class FileComparator {
     trackDirectory(folder);
   }
 
+  /**
+  * Given a File object, tracks all of the 
+  * files within directory, recursively
+  * including all files in subdirectories.
+  * All files in the directory and it's subdirectories are
+  * tracked.  A .occ cache file is created for each of the 
+  * files and placed in the caching directory.
+  *
+  * @param folder  a File directory containing files to be tracked
+  */
   public void trackDirectory(File folder) {
     // Tracks all of the files within the directory
     // Recursive, includes all files in subdirectories
@@ -68,11 +99,33 @@ public class FileComparator {
     }
   }
 
+  /**
+  * Creates a .occ file of important words in the
+  * cache directory for the given file.
+  * Reads the file at directory piece by piece and
+  * takes a count of the important words.  Once
+  * the entirety of the file is read it generates
+  * the .occ file containing the words and number
+  * of times they occur.
+  *
+  * @param directory  path to tracked file
+  */
   public void trackFile(String directory) {
     File file = new File(directory);
     trackFile(file);
   }
 
+  /**
+  * Creates a .occ file of important words in the
+  * cache directory for the given file.
+  * Reads the file passed piece by piece and
+  * takes a count of the important words.  Once
+  * the entirety of the file is read it generates
+  * the .occ file containing the words and number
+  * of times they occur.
+  *
+  * @param file  file object to be tracked
+  */
   public void trackFile(File file) {
     // If file doesn't exist, stop
     if (!file.exists()) {
@@ -146,7 +199,19 @@ public class FileComparator {
     trackedFiles.put(occName, file.lastModified());
   }
 
-  // TODO CHECK .OCC FILES FOR NEEDED UPDATES
+  /**
+  * Compares the input string to all tracked files,
+  * returning the top results number of matches.
+  * The input text is converted into a map
+  * of important words and the cosine similarity
+  * between that map and all of the tracked files
+  * is calculated.  The names of the top matching 
+  * files are returned.
+  * 
+  * @param text the text to compare to the tracked files
+  * @param results  the number of matching files to return
+  * @return  a ScoreBoard object containing the top matches
+  */
   public ScoreBoard compare(String text, int results) {
     // Compare each .occ file to text and return top results number results
     // Comparison using cosine similarity
