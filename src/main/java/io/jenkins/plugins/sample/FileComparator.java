@@ -7,15 +7,16 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
 
 /**
-* FileComparitor is the class for tracking source files and
-* generating the top matching files for a given input string.
-* All tracked files are given a cached file of the count
-* of their important words.
-*/
+ * FileComparitor is the class for tracking source files and generating the top matching files for a
+ * given input string. All tracked files are given a cached file of the count of their important
+ * words.
+ */
 public class FileComparator {
 
   public static final String FILE_EXT = ".occ";
@@ -28,12 +29,11 @@ public class FileComparator {
   private Map<String, Long> trackedFiles = new HashMap<String, Long>();
 
   /**
-  * Creates a new FileComparator that caches the important words
-  * for all of the files found in directory.
-  * Creates the caching directory if it doesn't exist.
-  *
-  * @param directory  the location of the files to be tracked
-  */
+   * Creates a new FileComparator that caches the important words for all of the files found in
+   * directory. Creates the caching directory if it doesn't exist.
+   *
+   * @param directory the location of the files to be tracked
+   */
   public FileComparator(String directory) {
     cacheDirectory =
         System.getProperty("user.dir") + File.separator + "Cache" + File.separator + directory;
@@ -50,14 +50,12 @@ public class FileComparator {
   }
 
   /**
-  * Tracks all of the files within directory, recursively
-  * including all files in subdirectories.
-  * All files in the directory and it's subdirectories are
-  * tracked.  A .occ cache file is created for each of the 
-  * files and placed in the caching directory.
-  *
-  * @param directory  the location of the files to be tracked
-  */
+   * Tracks all of the files within directory, recursively including all files in subdirectories.
+   * All files in the directory and it's subdirectories are tracked. A .occ cache file is created
+   * for each of the files and placed in the caching directory.
+   *
+   * @param directory the location of the files to be tracked
+   */
   public void trackDirectory(String directory) {
     // Tracks all of the files within the directory (absolute path)
     // Recursive, includes all files in subdirectories
@@ -67,15 +65,12 @@ public class FileComparator {
   }
 
   /**
-  * Given a File object, tracks all of the 
-  * files within directory, recursively
-  * including all files in subdirectories.
-  * All files in the directory and it's subdirectories are
-  * tracked.  A .occ cache file is created for each of the 
-  * files and placed in the caching directory.
-  *
-  * @param folder  a File directory containing files to be tracked
-  */
+   * Given a File object, tracks all of the files within directory, recursively including all files
+   * in subdirectories. All files in the directory and it's subdirectories are tracked. A .occ cache
+   * file is created for each of the files and placed in the caching directory.
+   *
+   * @param folder a File directory containing files to be tracked
+   */
   public void trackDirectory(File folder) {
     // Tracks all of the files within the directory
     // Recursive, includes all files in subdirectories
@@ -100,32 +95,25 @@ public class FileComparator {
   }
 
   /**
-  * Creates a .occ file of important words in the
-  * cache directory for the given file.
-  * Reads the file at directory piece by piece and
-  * takes a count of the important words.  Once
-  * the entirety of the file is read it generates
-  * the .occ file containing the words and number
-  * of times they occur.
-  *
-  * @param directory  path to tracked file
-  */
+   * Creates a .occ file of important words in the cache directory for the given file. Reads the
+   * file at directory piece by piece and takes a count of the important words. Once the entirety of
+   * the file is read it generates the .occ file containing the words and number of times they
+   * occur.
+   *
+   * @param directory path to tracked file
+   */
   public void trackFile(String directory) {
     File file = new File(directory);
     trackFile(file);
   }
 
   /**
-  * Creates a .occ file of important words in the
-  * cache directory for the given file.
-  * Reads the file passed piece by piece and
-  * takes a count of the important words.  Once
-  * the entirety of the file is read it generates
-  * the .occ file containing the words and number
-  * of times they occur.
-  *
-  * @param file  file object to be tracked
-  */
+   * Creates a .occ file of important words in the cache directory for the given file. Reads the
+   * file passed piece by piece and takes a count of the important words. Once the entirety of the
+   * file is read it generates the .occ file containing the words and number of times they occur.
+   *
+   * @param file file object to be tracked
+   */
   public void trackFile(File file) {
     // If file doesn't exist, stop
     if (!file.exists()) {
@@ -140,8 +128,7 @@ public class FileComparator {
     // Reads READ_LINES number of lines from the file at a time
     // Generates the important words from that chunk
     // Saves the occurrences in occurrences map
-    try {
-      fileReader = new BufferedReader(new FileReader(file));
+    try (fileReader = new BufferedReader(new FileReader(file))) {
       // Read file line by line
       while ((currLine = fileReader.readLine()) != null) {
         fileTextChunk.append(currLine);
@@ -160,24 +147,14 @@ public class FileComparator {
       }
     } catch (IOException e) {
       System.err.println("Unable to track " + file.getAbsolutePath());
-    } finally {
-      // Close fileReader
-      try {
-        if (fileReader != null) {
-          fileReader.close();
-        }
-      } catch (IOException ex) {
-        ex.printStackTrace();
-      }
-    }
+    } 
     // Write the occurrences to a .occ file
     BufferedWriter fileWriter = null;
     // Replace all file separators with something that won't be
     // interpreted as such
     String occName = fileToOccName(file.getAbsolutePath());
     String completePath = cacheDirectory + File.separator + occName;
-    try {
-      fileWriter = new BufferedWriter(new FileWriter(completePath));
+    try (fileWriter = new BufferedWriter(new FileWriter(completePath))) {
       // Write all unique occurrences and number to file
       for (Map.Entry<String, Integer> occurrence : occurrences.entrySet()) {
         fileWriter.write(occurrence.getKey() + " " + occurrence.getValue());
@@ -185,34 +162,47 @@ public class FileComparator {
       }
     } catch (IOException e) {
       System.err.println("Unable to cache occurrences for " + file.getAbsolutePath());
-    } finally {
-      // Close fileWriter
-      try {
-        if (fileWriter != null) {
-          fileWriter.close();
-        }
-      } catch (IOException ex) {
-        ex.printStackTrace();
-      }
-    }
+    } 
     // Add file to tracking list
     trackedFiles.put(occName, file.lastModified());
   }
 
   /**
-  * Compares the input string to all tracked files,
-  * returning the top results number of matches.
-  * The input text is converted into a map
-  * of important words and the cosine similarity
-  * between that map and all of the tracked files
-  * is calculated.  The names of the top matching 
-  * files are returned.
-  * 
-  * @param text the text to compare to the tracked files
-  * @param results  the number of matching files to return
-  * @return  a ScoreBoard object containing the top matches
-  */
+   * Compares the input string to all tracked files,
+   * returning the top results number of matches.
+   * The input text is converted into a map
+   * of important words and the cosine similarity
+   * between that map and all of the tracked files
+   * is calculated.  The names of the top matching 
+   * files are returned. 
+   *
+   * @param text the text to compare to the tracked files
+   * @param results the number of matching files to return
+   * @return a ScoreBoard object containing the top matches
+   */
   public ScoreBoard compare(String text, int results) {
+    SortedSet<Map.Entry<String, Double>> fileScores =
+	new TreeSet<Map.Entry<String, Double>>(
+	  new Comparator<Map.Entry<String, Double>>() {
+	    @Override
+	    public int compare(Map.Entry<String, Double> elem1, Map.Entry<String, Double> elem2) {
+	      return elem1.getValue().compareTo(elem2.getValue());
+	    }
+	  }
+	);
+    surfaceSimilarity(fileScores, text);
+    return fileScores;
+  }
+
+  private void updateOccIfOutdated(String name) {
+    // Update .occ file is its been modified since last tracking
+    File originalFile = new File(occToFileName(name));
+    if (trackedFiles.getOrDefault(name, 0L) < originalFile.lastModified()) {
+      trackFile(originalFile);
+    }
+  }
+
+  private void surfaceSimilarity(SortedSet fileScores, String text) {
     // Compare each .occ file to text and return top results number results
     // Comparison using cosine similarity
     // (A * B) / (|A| * |B|)
@@ -231,16 +221,10 @@ public class FileComparator {
     File folder = new File(cacheDirectory);
     File[] files = folder.listFiles();
     BufferedReader fileReader = null;
-    // Keeps the top 'results' number file scores
-    ScoreBoard topScorers = new ScoreBoard(results);
     for (File file : files) {
       // Update .occ file is its been modified since last tracking
-      File originalFile = new File(occToFileName(file.getName()));
-      if (trackedFiles.getOrDefault(file.getName(), 0L) < originalFile.lastModified()) {
-        trackFile(originalFile);
-      }
-      try {
-        fileReader = new BufferedReader(new FileReader(file));
+      updateOccIfOutdated(file.getName());
+      try (fileReader = new BufferedReader(new FileReader(file))) {
         // The magnitude of the current occ file
         int occFileNorm = 0; // B
         int dotProduct = 0;
@@ -263,20 +247,11 @@ public class FileComparator {
         // Calculate and save fileScore
         double fileScore = dotProduct / (textOccNorm * Math.sqrt(occFileNorm));
         // Score is saved if it is in top 'results' number of elements
-        topScorers.insert(occToFileName(file.getName()), fileScore);
+        fileScores.insert(occToFileName(file.getName()), fileScore);
       } catch (IOException e) {
         System.err.println("Unable to consider " + file.getName() + " in comparison");
-      } finally {
-        try {
-          if (fileReader != null) {
-            fileReader.close();
-          }
-        } catch (IOException ex) {
-          ex.printStackTrace();
-        }
-      }
+      } 
     }
-    return topScorers;
   }
 
   private void initializeTracker(String directory) {
@@ -298,6 +273,7 @@ public class FileComparator {
       // Reverse process to get original file
       File originalFile = new File(occToFileName(occFile.getName()));
       // Check if file is still part of the project
+      // TODO check occ file age and update if original file is newer
       if (originalFile.exists()) {
         trackedFiles.put(occFile.getName(), originalFile.lastModified());
       } else {
