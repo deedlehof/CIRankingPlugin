@@ -1,6 +1,5 @@
 package io.jenkins.plugins.sample;
 
-// import java.io.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,6 +24,8 @@ public class ImportantWordsGenerator {
 
   // Path to stop words file
   public static String STOPWORDSFILE;
+  // The number of lines to read at once
+  private static final int READ_LINES = 50;
 
   private static HashSet<String> stopWords;
 
@@ -77,6 +78,45 @@ public class ImportantWordsGenerator {
   }
 
   /**
+  * Creates a map of unique words and the number of
+  * occurrecnes contained within the input file.
+  *
+  * @param file	 the file to be scanned
+  * @return  a map of words and occurrences	
+  */
+  public Map<String, Integer> generate(File file) {
+    Map<String, Integer> occurrences = new HashMap<String, Integer>();
+    String currLine;
+    StringBuilder fileTextChunk = new StringBuilder();
+    int lineNum = 0;
+    // Reads READ_LINES number of lines from the file at a time
+    // Generates the important words from that chunk
+    // Saves the occurrences in occurrences map
+    try (BufferedReader fileReader = new BufferedReader(new FileReader(file))) {
+      // Read file line by line
+      while ((currLine = fileReader.readLine()) != null) {
+        fileTextChunk.append(currLine);
+        lineNum += 1;
+        // If lineNum is multiple of READ_LINES then process chunk
+        if (lineNum % READ_LINES == 0) {
+          // Extend the current occurrences with important words from this chunk
+          extendGeneration(fileTextChunk.toString(), occurrences);
+          // Reset the StringBuilder buffer to 0
+          fileTextChunk.setLength(0);
+        }
+      }
+      if (fileTextChunk.length() > 0) {
+        // Extend the current occurrences with important words from the final chunk
+        extendGeneration(fileTextChunk.toString(), occurrences);
+      }
+    } catch (IOException e) {
+      System.err.println("Unable to track " + file.getAbsolutePath());
+    } 
+    return occurrences; 
+  }
+  
+
+  /**
   * Appends the unique words and number of occurrences
   * to the given map.
   *
@@ -97,7 +137,6 @@ public class ImportantWordsGenerator {
         subToken = subToken.toLowerCase();
         // If the subToken isn't a stopword, then add it to occurrences
         if (!stopWords.contains(subToken)) {
-          // stem the word
           String stemmedToken = stemmer.stem(subToken);
           // add one to the number of occurences or set to 1 if doesn't exist
           occurrences.put(stemmedToken, occurrences.getOrDefault(stemmedToken, 0) + 1);
@@ -106,9 +145,7 @@ public class ImportantWordsGenerator {
       // Add the original token if it was broken up
       if (subTokens.length > 1) {
         token = token.toLowerCase();
-        // If the token isn't a stopword, then add it to result
         if (!stopWords.contains(token)) {
-          // stem the word
           String stemmedToken = stemmer.stem(token);
           // add one to the number of occurences or set to 1 if doesn't exist
           occurrences.put(stemmedToken, occurrences.getOrDefault(stemmedToken, 0) + 1);

@@ -7,10 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
+import java.util.Map.Entry;
 
 /**
  * FileComparitor is the class for tracking source files and generating the top matching files for a
@@ -20,7 +23,6 @@ import java.util.SortedSet;
 public class FileComparator {
 
   public static final String FILE_EXT = ".occ";
-  private static final int READ_LINES = 50;
   private static final String SEP_REPLACER = "%";
 
   public final String cacheDirectory;
@@ -119,42 +121,14 @@ public class FileComparator {
     if (!file.exists()) {
       return;
     }
-
-    Map<String, Integer> occurrences = new HashMap<String, Integer>();
-    BufferedReader fileReader = null;
-    String currLine;
-    StringBuilder fileTextChunk = new StringBuilder();
-    int lineNum = 0;
-    // Reads READ_LINES number of lines from the file at a time
-    // Generates the important words from that chunk
-    // Saves the occurrences in occurrences map
-    try (fileReader = new BufferedReader(new FileReader(file))) {
-      // Read file line by line
-      while ((currLine = fileReader.readLine()) != null) {
-        fileTextChunk.append(currLine);
-        lineNum += 1;
-        // If lineNum is multiple of READ_LINES then process chunk
-        if (lineNum % READ_LINES == 0) {
-          // Extend the current occurrences with important words from this chunk
-          importantWrdGen.extendGeneration(fileTextChunk.toString(), occurrences);
-          // Reset the StringBuilder buffer to 0
-          fileTextChunk.setLength(0);
-        }
-      }
-      if (fileTextChunk.length() > 0) {
-        // Extend the current occurrences with important words from the final chunk
-        importantWrdGen.extendGeneration(fileTextChunk.toString(), occurrences);
-      }
-    } catch (IOException e) {
-      System.err.println("Unable to track " + file.getAbsolutePath());
-    } 
+    // Get the important words from file
+    Map<String, Integer> occurrences = importantWrdGen.generate(file);
     // Write the occurrences to a .occ file
-    BufferedWriter fileWriter = null;
     // Replace all file separators with something that won't be
     // interpreted as such
     String occName = fileToOccName(file.getAbsolutePath());
     String completePath = cacheDirectory + File.separator + occName;
-    try (fileWriter = new BufferedWriter(new FileWriter(completePath))) {
+    try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(completePath))) {
       // Write all unique occurrences and number to file
       for (Map.Entry<String, Integer> occurrence : occurrences.entrySet()) {
         fileWriter.write(occurrence.getKey() + " " + occurrence.getValue());
@@ -180,17 +154,21 @@ public class FileComparator {
    * @param results the number of matching files to return
    * @return a ScoreBoard object containing the top matches
    */
-  public ScoreBoard compare(String text, int results) {
-    SortedSet<Map.Entry<String, Double>> fileScores =
-	new TreeSet<Map.Entry<String, Double>>(
-	  new Comparator<Map.Entry<String, Double>>() {
-	    @Override
-	    public int compare(Map.Entry<String, Double> elem1, Map.Entry<String, Double> elem2) {
-	      return elem1.getValue().compareTo(elem2.getValue());
-	    }
-	  }
-	);
+  public Map<String, Double> compare(String text, int results) {
+    Map<String, Double> fileScores = new LinkedHashMap<>();
+    // Calculate score
     surfaceSimilarity(fileScores, text);
+    // Sort the map by converting it to a list 
+    // and using list.sort.
+    // List sorting has O(n * log n) time complexity
+    List<Entry<String, Double>> scoresList = new ArrayList<>(fileScores.entrySet());
+    //emptry map
+    fileScores.clear();
+    scoresList.sort(Entry.comparingByValue());
+    for (int i = scoresList.size() - 1; i >= scoresList.size() - results; i -= 1) {
+      Entry<String, Double> entry = scoresList.get(i);
+      fileScores.put(entry.getKey(), entry.getValue());
+    }
     return fileScores;
   }
 
@@ -202,7 +180,7 @@ public class FileComparator {
     }
   }
 
-  private void surfaceSimilarity(SortedSet fileScores, String text) {
+  private void surfaceSimilarity(Map<String, Double> fileScores, String text) {
     // Compare each .occ file to text and return top results number results
     // Comparison using cosine similarity
     // (A * B) / (|A| * |B|)
@@ -220,11 +198,10 @@ public class FileComparator {
     // Generate comparison score against text
     File folder = new File(cacheDirectory);
     File[] files = folder.listFiles();
-    BufferedReader fileReader = null;
     for (File file : files) {
       // Update .occ file is its been modified since last tracking
       updateOccIfOutdated(file.getName());
-      try (fileReader = new BufferedReader(new FileReader(file))) {
+      try (BufferedReader fileReader = new BufferedReader(new FileReader(file))) {
         // The magnitude of the current occ file
         int occFileNorm = 0; // B
         int dotProduct = 0;
@@ -247,7 +224,7 @@ public class FileComparator {
         // Calculate and save fileScore
         double fileScore = dotProduct / (textOccNorm * Math.sqrt(occFileNorm));
         // Score is saved if it is in top 'results' number of elements
-        fileScores.insert(occToFileName(file.getName()), fileScore);
+        fileScores.put(occToFileName(file.getName()), fileScore);
       } catch (IOException e) {
         System.err.println("Unable to consider " + file.getName() + " in comparison");
       } 

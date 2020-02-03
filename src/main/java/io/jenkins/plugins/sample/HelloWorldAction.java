@@ -1,7 +1,11 @@
 package io.jenkins.plugins.sample;
 
 import hudson.model.Run;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import jenkins.model.RunAction2;
+
 
 /**
 * HelloWorldAction is responsible for serving
@@ -10,7 +14,7 @@ import jenkins.model.RunAction2;
 public class HelloWorldAction implements RunAction2 {
 
   private transient FileComparator fc;
-  private transient ScoreBoard matchedFiles;
+  private transient Map<String, Double> matchedFiles;
   private transient Run run;
 
   private String codeLocation;
@@ -32,19 +36,23 @@ public class HelloWorldAction implements RunAction2 {
 
     matchedFiles = fc.compare(bugReport, 5);
     System.err.println("=======TOP MATCHING FILES=========");
-    System.err.println(matchedFiles);
+    for (Map.Entry<String, Double> entry: matchedFiles.entrySet()) {
+      System.out.println(entry.getValue() + " --- " + entry.getKey());
+    }
+    
   }
 
   public String getCodeLocation() {
     return codeLocation;
   }
 
-  public ScoreBoard getMatchedFiles() {
+  public Map<String, Double> getMatchedFiles() {
     return matchedFiles;
   }
 
   public String[] getFileLabels() {
-    return matchedFiles.getLabels();
+    Set<String> keys = matchedFiles.keySet();
+    return keys.toArray(new String[keys.size()]);
   }
 
   @Override
