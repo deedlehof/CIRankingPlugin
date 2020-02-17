@@ -5,7 +5,7 @@
 
 \newenvironment{logentry}[2]% date, heading
 {\noindent\vspace{.2cm}\large\textbf{#2}\titlerule\large\textbf{#1}}
-{\\\\\\\vspace{5cm}}
+{\\\\\\}
 
 \begin{document}
 \begin{logentry}{01/20/20}{{\LaTeX}, Google Format, and DE}
@@ -41,5 +41,50 @@
     {\LaTeX} is very powerful and I've got it automated with plugins 
     Ultisnips and vimtex, so that it is extremely easy to update when I make 
     changes to the project.
+\end{logentry}
+\begin{logentry}{02/01/20}{Cutting Fat and Cleaning Code}
+    \par The main focus for my recent work has been cleaning up the 
+    code and removing unnecessary pieces.  I've removed some code that was
+    responsible for keeping track of the top scorers.  Now, everything is map
+    based.  I sort the map and pass a sub-map back with the top results.
+    No more custom code solutions, no need to reinvent the wheel.
+    \par I've also been working on documentation.  I finished
+    all of the Javadoc comments for my code and I've done
+    the last round of formatting.
+    \par I've shifted around where certain operations are done.
+    For example, I was doing file processing in file tracking for important
+    word generation.  I would pass chunks of the file to the
+    important words generator and it would hand back a map.
+    I'd feed that map and another chunk back into the generator.
+    This added a lot of unnecessary code to the file tracking.
+    I've moved this functionality to the important words generator;
+    now, I can feed it a file and it returns the map for the entire file.
+    \par The last major change I've done is update the project to use
+    a newer version of Java.  Newer Java versions added some functionality
+    that I wanted to use for this project, like try-with-resources.
+    \par The next step is to implement Unit Testing.  The code is in a 
+    decent spot right now and it's important to write tests before
+    I expand it any further.
+\end{logentry}
+\begin{logentry}{02/17/20}{Bug Fixing and Testing}
+    \par When I started trying to implement JUnit tests in maven for the project
+    I ran into a wall.  There were a lot of problems with my pom file and
+    dependencies.  I'm not sure if it was the transition to the newer version
+    of Java that broke certain pieces or that some of the dependencies
+    that the Jenkins pom shipped with were out of date, probably
+    a combination.  
+    \par The problems with maven are now fixed.  JUnit is working and
+    in the process I found some problems with my code.  When I fixed
+    the pom a module that should've been working since the start 
+    began to run, the bug detection module.  It scans the code for 
+    potential problems or bugs.  When I fixed the pom I was suddenly 
+    alerted to several problem areas in my code that needed fixing
+    before I continued working on testing.
+    \par Test development is now the main focus.  I've written
+    most of the testing for the ImportantWordsGenerator at this point.
+    Once that is all done, I'm going to work on getting a measure of 
+    project efficiency.  That is, how quickly my software is able
+    to process a project and return the top matching files.
+    I'll be using Defects4j to supply the source code to test.
 \end{logentry}
 \end{document}

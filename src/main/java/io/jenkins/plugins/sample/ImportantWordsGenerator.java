@@ -2,8 +2,9 @@ package io.jenkins.plugins.sample;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,10 +21,11 @@ import org.apache.commons.lang.StringUtils;
 public class ImportantWordsGenerator {
 
   // Static instance variable
-  public static ImportantWordsGenerator INSTANCE = new ImportantWordsGenerator();
+  public static ImportantWordsGenerator INSTANCE = null;
 
   // Path to stop words file
-  public static String STOPWORDSFILE;
+  public static final String STOP_WORD_FILE_PATH = 
+      System.getProperty("user.dir") + File.separator + "stop_words.txt";
   // The number of lines to read at once
   private static final int READ_LINES = 50;
 
@@ -33,36 +35,36 @@ public class ImportantWordsGenerator {
   private final PorterStemmer stemmer;
 
   private ImportantWordsGenerator() {
-    String fileSep = File.separator;
-    STOPWORDSFILE = System.getProperty("user.dir") + fileSep + "stop_words.txt";
-
     tokenizer = SimpleTokenizer.INSTANCE;
     stemmer = new PorterStemmer();
 
-    // Initialize stopWords and fill it with words from STOPWORDSFILE
+    // Initialize stopWords and fill it with words from STOP_WORD_FILE_PATH
     stopWords = new HashSet<String>();
-    BufferedReader stpWrdReader = null;
-    try {
-      System.err.println("Stop Words File: " + STOPWORDSFILE);
+    try (BufferedReader stpWrdReader = new BufferedReader(new InputStreamReader(
+	    new FileInputStream(STOP_WORD_FILE_PATH), "UTF-8"))) {
+      System.err.println("Stop Words File: " + STOP_WORD_FILE_PATH);
       String currStpWrd;
-      stpWrdReader = new BufferedReader(new FileReader(STOPWORDSFILE));
       // One stop word per line
       while ((currStpWrd = stpWrdReader.readLine()) != null) {
         stopWords.add(currStpWrd);
       }
     } catch (IOException e) {
       e.printStackTrace();
-    } finally {
-      // Close the BufferedReader
-      try {
-        if (stpWrdReader != null) {
-          stpWrdReader.close();
-        }
-      } catch (IOException ex) {
-        ex.printStackTrace();
-      }
     }
   }
+
+  /**
+  * Gets the instance of ImportantWordsGenerator, creates it if null.
+  *
+  * @return  Instance of ImportantWordsGenerator	
+  */
+  public static ImportantWordsGenerator getInstance() {
+    if (INSTANCE == null) {
+      INSTANCE = new ImportantWordsGenerator();
+    } 
+    return INSTANCE;
+  }
+  
 
   /**
   * Creates a map of unique words and the number of
@@ -79,7 +81,9 @@ public class ImportantWordsGenerator {
 
   /**
   * Creates a map of unique words and the number of
-  * occurrecnes contained within the input file.
+  * occurrecnes contained within the input file. 
+  * Reades READ_LINES number of lines from the file
+  * at a time and processes them.
   *
   * @param file	 the file to be scanned
   * @return  a map of words and occurrences	
@@ -89,17 +93,13 @@ public class ImportantWordsGenerator {
     String currLine;
     StringBuilder fileTextChunk = new StringBuilder();
     int lineNum = 0;
-    // Reads READ_LINES number of lines from the file at a time
-    // Generates the important words from that chunk
-    // Saves the occurrences in occurrences map
-    try (BufferedReader fileReader = new BufferedReader(new FileReader(file))) {
-      // Read file line by line
+    try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(
+	    new FileInputStream(file), "UTF-8"))) {
       while ((currLine = fileReader.readLine()) != null) {
         fileTextChunk.append(currLine);
         lineNum += 1;
         // If lineNum is multiple of READ_LINES then process chunk
         if (lineNum % READ_LINES == 0) {
-          // Extend the current occurrences with important words from this chunk
           extendGeneration(fileTextChunk.toString(), occurrences);
           // Reset the StringBuilder buffer to 0
           fileTextChunk.setLength(0);
@@ -125,8 +125,6 @@ public class ImportantWordsGenerator {
   * @return  a map of words and occurrences
   */
   public Map<String, Integer> extendGeneration(String input, Map<String, Integer> occurrences) {
-    // Takes a string input and a map of occurrences
-    // Occurrences is a map of unique words with their number of occurrences
     // Convert the input into tokens
     String[] tokens = tokenizer.tokenize(input);
 

@@ -3,10 +3,12 @@ package io.jenkins.plugins.sample;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream; 
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader; 
+import java.io.OutputStreamWriter; 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,7 +28,7 @@ public class FileComparator {
   private static final String SEP_REPLACER = "%";
 
   public final String cacheDirectory;
-  private ImportantWordsGenerator importantWrdGen = ImportantWordsGenerator.INSTANCE;
+  private ImportantWordsGenerator importantWrdGen = ImportantWordsGenerator.getInstance();
   // Contains all tracked files and their lastModified date
   private Map<String, Long> trackedFiles = new HashMap<String, Long>();
 
@@ -128,7 +130,8 @@ public class FileComparator {
     // interpreted as such
     String occName = fileToOccName(file.getAbsolutePath());
     String completePath = cacheDirectory + File.separator + occName;
-    try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(completePath))) {
+    try (BufferedWriter fileWriter = new BufferedWriter(new OutputStreamWriter(
+	    new FileOutputStream(completePath), "UTF-8"))) {
       // Write all unique occurrences and number to file
       for (Map.Entry<String, Integer> occurrence : occurrences.entrySet()) {
         fileWriter.write(occurrence.getKey() + " " + occurrence.getValue());
@@ -159,7 +162,6 @@ public class FileComparator {
     // Calculate score
     surfaceSimilarity(fileScores, text);
     // Sort the map by converting it to a list 
-    // and using list.sort.
     // List sorting has O(n * log n) time complexity
     List<Entry<String, Double>> scoresList = new ArrayList<>(fileScores.entrySet());
     //emptry map
@@ -201,7 +203,8 @@ public class FileComparator {
     for (File file : files) {
       // Update .occ file is its been modified since last tracking
       updateOccIfOutdated(file.getName());
-      try (BufferedReader fileReader = new BufferedReader(new FileReader(file))) {
+      try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(
+	      new FileInputStream(file), "UTF-8"))) {
         // The magnitude of the current occ file
         int occFileNorm = 0; // B
         int dotProduct = 0;
@@ -222,7 +225,7 @@ public class FileComparator {
         }
 
         // Calculate and save fileScore
-        double fileScore = dotProduct / (textOccNorm * Math.sqrt(occFileNorm));
+        double fileScore = dotProduct / (textOccMag * Math.sqrt(occFileNorm));
         // Score is saved if it is in top 'results' number of elements
         fileScores.put(occToFileName(file.getName()), fileScore);
       } catch (IOException e) {
