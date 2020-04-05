@@ -59,4 +59,66 @@ public class ImportantWordsGeneratorTest {
       Assert.fail("Word Generator removed incorrect words");
     } 
   } 
+
+  @Test
+  public void testStringGenerate() {
+    String input = "This is a test string full of possible words as well as camelCase words";
+    Map<String, Integer> expected = new HashMap<String, Integer>();
+    expected.put("thi", 1);
+    expected.put("test", 1);
+    expected.put("camel", 1);
+    expected.put("well", 1);
+    expected.put("possibl", 1);
+    expected.put("word", 2);
+    expected.put("camelcas", 1);
+    expected.put("case", 1);
+    expected.put("full", 1);
+    Map<String, Integer> occs = wordGen.generate(input);
+    if (!occs.equals(expected)) {
+      Assert.fail("String Generate created incorrect mappings");   
+    } 
+  } 
+
+  @Test
+  public void testFileGenerate() {
+    File input = new File(getClass().getResource("ImportantWordGen/file.txt").getFile());
+    Map<String, Integer> expected = new HashMap<String, Integer>();
+    expected.put("thi", 1);
+    expected.put("test", 1);
+    expected.put("camel", 1);
+    expected.put("well", 1);
+    expected.put("possibl", 1);
+    expected.put("word", 2);
+    expected.put("camelcas", 1);
+    expected.put("case", 1);
+    expected.put("full", 1);
+    Map<String, Integer> occs = wordGen.generate(input);
+    if (!occs.equals(expected)) {
+      Assert.fail("File Generate created incorrect mappings");   
+    } 
+  }
+
+  @Test
+  public void testExtendGenerate() {
+    Map<String, Integer> expected = new HashMap<String, Integer>();
+    expected.put("thi", 2);
+    expected.put("test", 2);
+    expected.put("camel", 2);
+    expected.put("well", 1);
+    expected.put("possibl", 1);
+    expected.put("word", 2);
+    expected.put("camelcas", 1);
+    expected.put("case", 1);
+    expected.put("full", 1);
+    Map<String, Integer> occs = new HashMap<String, Integer>();
+    occs.put("thi", 1);
+    occs.put("test", 1);
+    occs.put("camel", 1);
+    String input = "This is a test string full of possible words as well as camelCase words";
+    wordGen.extendGeneration(input, occs);
+    if (!occs.equals(expected)) {
+      Assert.fail("Extending Generation created incorrect mappings");   
+    } 
+  } 
+  
 }

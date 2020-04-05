@@ -12,10 +12,12 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * FileComparitor is the class for tracking source files and generating the top matching files for a
@@ -36,7 +38,7 @@ public class FileComparator {
    * Creates a new FileComparator that caches the important words for all of the files found in
    * directory. Creates the caching directory if it doesn't exist.
    *
-   * @param directory the location of the files to be tracked
+   * @param directory the cache directory name
    */
   public FileComparator(String directory) {
     cacheDirectory =
@@ -52,6 +54,20 @@ public class FileComparator {
       System.err.println("MADE DIR: " + cacheDirFile.mkdirs());
     }
   }
+
+  /**
+  * Converts tracked files to their system name and returns them.
+  *
+  * @return a String Set of tracked files
+  */
+  public Set<String> getTrackedFiles() {
+    Set<String> tracked = new HashSet<String>();
+    for (String tf : trackedFiles.keySet()) {
+      tracked.add(occToFileName(tf));
+    }
+    return tracked;
+  }
+  
 
   /**
    * Tracks all of the files within directory, recursively including all files in subdirectories.
@@ -155,7 +171,7 @@ public class FileComparator {
    *
    * @param text the text to compare to the tracked files
    * @param results the number of matching files to return
-   * @return a ScoreBoard object containing the top matches
+   * @return a Map containing the top matches
    */
   public Map<String, Double> compare(String text, int results) {
     Map<String, Double> fileScores = new LinkedHashMap<>();
@@ -167,6 +183,10 @@ public class FileComparator {
     //emptry map
     fileScores.clear();
     scoresList.sort(Entry.comparingByValue());
+    //Place the top results number of results into fileScores
+    if (scoresList.size() < results) {
+      results = scoresList.size();
+    } 
     for (int i = scoresList.size() - 1; i >= scoresList.size() - results; i -= 1) {
       Entry<String, Double> entry = scoresList.get(i);
       fileScores.put(entry.getKey(), entry.getValue());
@@ -246,7 +266,7 @@ public class FileComparator {
               public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(FILE_EXT);
               }
-            });
+            });	
 
     for (File occFile : occFiles) {
       // occFile name is path with .occ extension added and file separators replaced
