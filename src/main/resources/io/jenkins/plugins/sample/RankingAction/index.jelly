@@ -1,0 +1,15 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+    <l:layout title="Bug Ranking">
+        <l:main-panel>
+            <h1>
+                Bug Ranking
+            </h1>
+            <ul>
+                <li>
+                    Code Location: ${it.codeLocation}
+                </li>
+            </ul>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>
