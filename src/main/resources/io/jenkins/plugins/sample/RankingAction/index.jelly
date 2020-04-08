@@ -5,11 +5,15 @@
             <h1>
                 Bug Ranking
             </h1>
-            <ul>
+	    <p>
+                <b>Code Location: </b>${it.codeLocation}
+            </p>
+            <h3>Top Results</h3>
+            <j:forEach var="item" items="${it.fileLabels}">
                 <li>
-                    Code Location: ${it.codeLocation}
+                    <p>"${item}"</p>
                 </li>
-            </ul>
+            </j:forEach>
         </l:main-panel>
     </l:layout>
 </j:jelly>

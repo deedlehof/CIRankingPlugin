@@ -30,11 +30,14 @@ public class RankingAction implements Action {
   *
   */
   public RankingAction(Project project) {
-    this.codeLocation = "This is a test location"; //TODO DELETE
+    this.project = project;
+
+    this.codeLocation = "/home/tanner/School/Project/Lang/src/main"; //TODO DELETE
+    this.bugReport = "  NumberUtils.createLong() does not handle hex numbers, but createInteger() handles hex and octal. This seems odd.  NumberUtils.createNumber() assumes that hex numbers can only be Integer. Again, why not handle bigger Hex numbers?  ==  It is trivial to fix createLong() - just use Long.decode() instead of valueOf(). It's not clear why this was not done originally - the decode() method was added to both Integer and Long in Java 1.2.  Fixing createNumber() is also fairly easy - if the hex string has more than 8 digits, use Long.  Should we allow for leading zeros in an Integer? If not, the length check is trivial.";
     /*
     this.codeLocation = codeLocation;
     this.bugReport = bugReport;
-
+    */
     fc = new FileComparator("Lang");
     fc.trackDirectory(codeLocation);
 
@@ -43,8 +46,7 @@ public class RankingAction implements Action {
     for (Map.Entry<String, Double> entry: matchedFiles.entrySet()) {
       System.out.println(entry.getValue() + " --- " + entry.getKey());
     }
-    */
-    this.project = project;
+    
   }
 
   public String getCodeLocation() {
