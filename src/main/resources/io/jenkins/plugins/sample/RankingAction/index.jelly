@@ -1,6 +1,5 @@
-<?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form">
-    <l:layout title="Bug Ranking">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+    <l:layout title="Bug Ranking" norefresh="true">
         <l:main-panel>
             <h1>
                 Bug Ranking
@@ -8,12 +7,13 @@
 	    <p>
                 <b>Code Location: </b>${it.codeLocation}
             </p>
-	    <f:entry title="${%Report}">
-		<f:textbox field="bugReport" />
-	    </f:entry>
-	    <f:validateButton
-		    title="${%Ranking}" progress="${%Ranking...}"
-		    method="calculateRanking" with="bugReport" />
+	    <f:form method="post" action="calculateResults" name="calculateResults">
+		<f:block>
+		    <h2>${%Bug Report}</h2>
+		    <f:textarea name="bugReport" value="${resource.bugReport}"/>
+			<f:submit value="${%Update}" />
+		</f:block>
+	    </f:form>
             <h3>Top Results</h3>
             <j:forEach var="item" items="${it.fileLabels}">
                 <li>
