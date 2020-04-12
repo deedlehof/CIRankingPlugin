@@ -1,5 +1,5 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form">
     <l:layout title="Bug Ranking">
         <l:main-panel>
             <h1>
@@ -8,6 +8,12 @@
 	    <p>
                 <b>Code Location: </b>${it.codeLocation}
             </p>
+	    <f:entry title="${%Report}">
+		<f:textbox field="bugReport" />
+	    </f:entry>
+	    <f:validateButton
+		    title="${%Ranking}" progress="${%Ranking...}"
+		    method="calculateRanking" with="bugReport" />
             <h3>Top Results</h3>
             <j:forEach var="item" items="${it.fileLabels}">
                 <li>
