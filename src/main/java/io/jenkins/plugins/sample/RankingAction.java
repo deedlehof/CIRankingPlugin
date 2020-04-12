@@ -101,14 +101,16 @@ public class RankingAction extends AbstractDescribableImpl<RankingAction> implem
   } 
 
   @Extension
-  public static class DescriptorImpl extends Descriptor<RankingAction> {
+  public static final class DescriptorImpl extends Descriptor<RankingAction> {
 
-    //@POST
+    @POST
     public FormValidation doCalculateRanking(@QueryParameter("bugReport") final String bugReport, 
 	@AncestorInPath Job job) throws IOException, ServletException {
-      //report = bugReport;
-      System.err.println("CALLED DO CALCULATE");
-      return FormValidation.ok("Success");
+      if (job == null) {
+	return FormValidation.error("Empty bug report");
+      } 
+      return FormValidation.ok();
     }
+
   } 
 }
