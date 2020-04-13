@@ -13,16 +13,20 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.ServletException;
-import javax.ws.rs.POST;
 import jenkins.model.TransientActionFactory;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.HttpRedirect;
+import org.kohsuke.stapler.HttpResponse;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
 * HelloWorldAction is responsible for serving
 * data to the plugin front-end.
 */
-public class RankingAction extends AbstractDescribableImpl<RankingAction> implements Action {
+public class RankingAction implements Action {
 
   private transient FileComparator fc;
   private transient Map<String, Double> matchedFiles;
@@ -70,6 +74,12 @@ public class RankingAction extends AbstractDescribableImpl<RankingAction> implem
     return keys.toArray(new String[keys.size()]);
   }
 
+  public HttpResponse doCalculateResults(StaplerRequest req) throws IOException, ServletException {
+    JSONObject jsonData = req.getSubmittedForm();
+    String bugReport = jsonData.optString("bugReport");
+    return new HttpRedirect("index");
+  } 
+
   @Override
   public String getIconFileName() {
     return "document.png";
@@ -100,17 +110,4 @@ public class RankingAction extends AbstractDescribableImpl<RankingAction> implem
     } 
   } 
 
-  @Extension
-  public static final class DescriptorImpl extends Descriptor<RankingAction> {
-
-    @POST
-    public FormValidation doCalculateRanking(@QueryParameter("bugReport") final String bugReport, 
-	@AncestorInPath Job job) throws IOException, ServletException {
-      if (job == null) {
-	return FormValidation.error("Empty bug report");
-      } 
-      return FormValidation.ok();
-    }
-
-  } 
 }
