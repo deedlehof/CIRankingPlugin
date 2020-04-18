@@ -7,12 +7,12 @@
             </h1>
 	    <f:form method="post" action="calculateResults" name="calculateResults">
 		<f:block>
-		    <h2>${%Bug Report}</h2>
+		    <h3>${%Bug Report}</h3>
 		    <div class="form">
 		    <f:textarea name="bugReport" value="${it.report}"/>
 		    </div>
 		    <div class="submit">
-			<f:submit value="${%Update}" />
+			<f:submit value="${%Search}" />
 		    </div>
 		</f:block>
 	    </f:form>
@@ -24,8 +24,13 @@
 	    <ul>
             <j:forEach var="item" items="${it.matchedFiles}">
                 <li>
-		    <p>${item.getKey()}</p>
-                    <p>${item.getValue()}</p>
+		    <j:if test="${item.getValue() >= 10}">
+			<p id="percent">${item.getValue()}%</p>
+		    </j:if>
+		    <j:if test="${10 > item.getValue()}">
+			<p id="percent">0${item.getValue()}%</p>
+		    </j:if>
+		    <p id="file">${item.getKey()}</p>
                 </li>
             </j:forEach>
 	    </ul>
@@ -35,11 +40,23 @@
     </l:layout>
     <style type="text/css">
 	body {
-	    background-color: #add8e6;
+	    background-color: #c5e3ed;
 	}
 
 	div.body {
-	    width: 900px;
+	    width: 1000px;
+	    
+	    position: absolute;
+	    top:90px;
+	    bottom: 0;
+	    left: 0;
+	    right: 0;
+  	
+	    margin: auto;
+	}
+
+	footer {
+	    display: none;
 	}
 
 	div.form {
@@ -51,8 +68,19 @@
 	}
 
 	div.results li {
-	    list-style-type: decimal;
+	    list-style-type: none;
 	}
 
+	div.results p {
+	    float: left;
+	}
+
+	div.results #percent {
+	    width: 15%;
+	}
+
+	div.results #file {
+	    width: 85%;
+	}
     </style>
 </j:jelly>
