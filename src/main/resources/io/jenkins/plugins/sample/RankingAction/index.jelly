@@ -2,6 +2,10 @@
     <l:layout title="Bug Ranking" norefresh="true">
 	<div class="body">
         <l:main-panel>
+	    <div class="sidebar-rank">
+	    <h3>Menu</h3>
+	    <a href="settings"> Link 1</a>
+	    </div>
             <h1>
                 Bug Ranking
             </h1>
@@ -45,13 +49,6 @@
 
 	div.body {
 	    width: 1000px;
-	    
-	    position: absolute;
-	    top:90px;
-	    bottom: 0;
-	    left: 0;
-	    right: 0;
-  	
 	    margin: auto;
 	}
 

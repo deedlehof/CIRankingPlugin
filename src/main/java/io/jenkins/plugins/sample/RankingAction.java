@@ -95,6 +95,12 @@ public class RankingAction implements Action {
     return new HttpRedirect("index");
   } 
 
+  public HttpResponse doSetProperties(StaplerRequest req) throws IOException, ServletException {
+    JSONObject jsonData = req.getSubmittedForm();
+    codeLocation = jsonData.optString("codeLocation");
+    return new HttpRedirect("settings");
+  } 
+
   @Override
   public String getIconFileName() {
     return "document.png";

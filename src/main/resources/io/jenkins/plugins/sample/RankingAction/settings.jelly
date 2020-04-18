@@ -1,0 +1,20 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
+    <l:layout title="Bug Ranking" norefresh="true">
+        <l:main-panel>
+            <h1>
+                Properties
+            </h1>
+	    <f:form method="post" action="setProperties" name="setProperties">
+                <f:block>
+		    <h4>Code Location</h4> 
+                    <div class="form">
+                    <f:textarea name="codeLocation" value="${it.codeLocation}"/>
+                    </div>
+                    <div class="submit">
+			<f:submit value="${%Save}" />
+                    </div>
+                  </f:block>
+              </f:form>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>
