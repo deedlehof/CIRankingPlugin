@@ -1,25 +1,58 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
     <l:layout title="Bug Ranking" norefresh="true">
+	<div class="body">
         <l:main-panel>
             <h1>
                 Bug Ranking
             </h1>
-	    <p>
-                <b>Code Location: </b>${it.codeLocation}
-            </p>
 	    <f:form method="post" action="calculateResults" name="calculateResults">
 		<f:block>
 		    <h2>${%Bug Report}</h2>
-		    <f:textarea name="bugReport" value="${resource.bugReport}"/>
+		    <div class="form">
+		    <f:textarea name="bugReport" value="${it.report}"/>
+		    </div>
+		    <div class="submit">
 			<f:submit value="${%Update}" />
+		    </div>
 		</f:block>
 	    </f:form>
+	    <j:if test="${!it.report.isEmpty()}">
+	    <hr></hr>
             <h3>Top Results</h3>
-            <j:forEach var="item" items="${it.fileLabels}">
+	    </j:if>
+	    <div class="results">
+	    <ul>
+            <j:forEach var="item" items="${it.matchedFiles}">
                 <li>
-                    <p>"${item}"</p>
+		    <p>${item.getKey()}</p>
+                    <p>${item.getValue()}</p>
                 </li>
             </j:forEach>
+	    </ul>
+	    </div>
         </l:main-panel>
+	</div>
     </l:layout>
+    <style type="text/css">
+	body {
+	    background-color: #add8e6;
+	}
+
+	div.body {
+	    width: 900px;
+	}
+
+	div.form {
+	    border: 1px solid black;
+	}
+
+	div.submit {
+	    float: right;
+	}
+
+	div.results li {
+	    list-style-type: decimal;
+	}
+
+    </style>
 </j:jelly>

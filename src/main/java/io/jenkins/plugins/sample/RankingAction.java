@@ -10,6 +10,7 @@ import hudson.util.FormValidation;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.ServletException;
@@ -32,7 +33,7 @@ public class RankingAction implements Action {
   private transient Map<String, Double> matchedFiles;
 
   private String codeLocation;
-  private String report;
+  private String report = "";
 
   private Project project;
 
@@ -46,7 +47,6 @@ public class RankingAction implements Action {
 
     this.codeLocation = "/home/tanner/School/Project/Lang/src/main"; //TODO DELETE
     /*
-    this.report = "  NumberUtils.createLong() does not handle hex numbers, but createInteger() handles hex and octal. This seems odd.  NumberUtils.createNumber() assumes that hex numbers can only be Integer. Again, why not handle bigger Hex numbers?  ==  It is trivial to fix createLong() - just use Long.decode() instead of valueOf(). It's not clear why this was not done originally - the decode() method was added to both Integer and Long in Java 1.2.  Fixing createNumber() is also fairly easy - if the hex string has more than 8 digits, use Long.  Should we allow for leading zeros in an Integer? If not, the length check is trivial.";
     this.codeLocation = codeLocation;
     this.report = report;
     */
@@ -67,8 +67,16 @@ public class RankingAction implements Action {
     return codeLocation;
   }
 
-  public Map<String, Double> getMatchedFiles() {
-    return matchedFiles;
+  public String getReport() {
+    return report;
+  } 
+
+  public Map<String, Integer> getMatchedFiles() {
+    Map<String, Integer> formatted = new LinkedHashMap<>();
+    for (Map.Entry<String, Double> match: matchedFiles.entrySet()) {
+      formatted.put(match.getKey(), (int)Math.round(match.getValue() * 100));
+    }
+    return formatted; 
   }
 
   public String[] getFileLabels() {
