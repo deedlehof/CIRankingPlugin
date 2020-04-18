@@ -1,20 +1,103 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
     <l:layout title="Bug Ranking" norefresh="true">
         <l:main-panel>
+	    <div class="sidebar">
+	    <a href="index" class="bar-item">Search</a>
+	    <a href="settings" class="bar-item">Settings</a>
+	    </div>
+	    <div class="body">
             <h1>
                 Properties
             </h1>
 	    <f:form method="post" action="setProperties" name="setProperties">
-                <f:block>
-		    <h4>Code Location</h4> 
-                    <div class="form">
-                    <f:textarea name="codeLocation" value="${it.codeLocation}"/>
-                    </div>
-                    <div class="submit">
+		<f:block>
+		    <h3>${%Number Of Results}</h3>
+		    <div class="form-num-results">
+		    <f:number name="numResults" value="${it.numResults}"/>
+		    </div>
+		    <h3>${%Code Location}</h3>
+		    <div class="form-code-location">
+		    <f:textarea name="codeLocation" value="${it.codeLocation}"/>
+		    </div>
+		    <hr></hr>
+		    <div class="submit">
 			<f:submit value="${%Save}" />
-                    </div>
-                  </f:block>
-              </f:form>
+		    </div>
+		</f:block>
+	    </f:form>
+	    </div>
         </l:main-panel>
     </l:layout>
+    <style type="text/css">
+	body {
+	    background-color: #c5e3ed;
+	}
+
+	div.body {
+	    width: 1000px;
+	    margin-left:150px;
+	    padding: 0px 10px;
+	}
+
+	footer {
+	    display: none;
+	}
+
+	div.form-code-location {
+	    border: 1px solid black;
+	    height: 50px;
+	    overflow: hidden;
+	}
+
+	div.form-num-results {
+	    border: 1px solid black;
+	    width: 120px;
+	}
+
+	div.submit {
+	    float: right;
+	}
+
+	div.results li {
+	    list-style-type: none;
+	}
+
+	div.results p {
+	    float: left;
+	}
+
+	div.results #percent {
+	    width: 15%;
+	}
+
+	div.results #file {
+	    width: 85%;
+	}
+
+	div.sidebar a {
+	    padding: 6px 8px 6px 16px;
+	    text-decoration: none;
+	    font-size: 20px;
+	    color: #000000;
+	    display: block;
+	}
+
+	div.sidebar a:hover {
+	    color: #0000FF;
+	    position: relative;
+	    right: -5px;
+	}
+
+	div.sidebar {
+	    width: 130px;
+	    position: fixed;
+	    z-index: 1;
+	    padding-top: 50px;
+	    left: 40px;
+	    background: #F6FAF2;
+	    overflow-x: hidden;
+	    padding: 8px 0;
+	}
+
+    </style>
 </j:jelly>

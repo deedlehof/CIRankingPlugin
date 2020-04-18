@@ -1,11 +1,11 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:f="/lib/form">
     <l:layout title="Bug Ranking" norefresh="true">
-	<div class="body">
         <l:main-panel>
-	    <div class="sidebar-rank">
-	    <h3>Menu</h3>
-	    <a href="settings"> Link 1</a>
+	    <div class="sidebar">
+	    <a href="index" class="bar-item">Search</a>
+	    <a href="settings" class="bar-item">Settings</a>
 	    </div>
+	    <div class="body">
             <h1>
                 Bug Ranking
             </h1>
@@ -39,8 +39,8 @@
             </j:forEach>
 	    </ul>
 	    </div>
+	    </div>
         </l:main-panel>
-	</div>
     </l:layout>
     <style type="text/css">
 	body {
@@ -49,7 +49,8 @@
 
 	div.body {
 	    width: 1000px;
-	    margin: auto;
+	    margin-left:150px;
+	    padding: 0px 10px;
 	}
 
 	footer {
@@ -62,6 +63,7 @@
 
 	div.submit {
 	    float: right;
+	    padding-top: 5px;
 	}
 
 	div.results li {
@@ -79,5 +81,31 @@
 	div.results #file {
 	    width: 85%;
 	}
+
+	div.sidebar a {
+	    padding: 6px 8px 6px 16px;
+	    text-decoration: none;
+	    font-size: 20px;
+	    color: #000000;
+	    display: block;
+	}
+
+	div.sidebar a:hover {
+	    color: #0000FF;
+	    position: relative;
+	    right: -5px;
+	}
+
+	div.sidebar {
+	    width: 130px;
+	    position: fixed;
+	    z-index: 1;
+	    padding-top: 50px;
+	    left: 40px;
+	    background: #F6FAF2;
+	    overflow-x: hidden;
+	    padding: 8px 0;
+	}
+
     </style>
 </j:jelly>

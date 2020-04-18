@@ -1,0 +1,63 @@
+body {
+    background-color: #c5e3ed;
+}
+
+div.body {
+      width: 1000px;
+     margin-left:150px;
+     padding: 0px 10px;
+}
+
+footer {
+    display: none;
+}
+
+div.form {
+    border: 1px solid black;
+}
+
+div.submit {
+    float: right;
+}
+
+div.results li {
+    list-style-type: none;
+}
+
+div.results p {
+    float: left;
+}
+
+div.results #percent {
+    width: 15%;
+}
+
+div.results #file {
+    width: 85%;
+}
+
+div.sidebar a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: #000000;
+    display: block;
+}
+
+div.sidebar a:hover {
+    color: #0000FF;
+    position: relative;
+    right: -5px;
+}
+
+div.sidebar {
+    width: 130px;
+    position: fixed;
+    z-index: 1;
+    padding-top: 50px;
+    left: 40px;
+    background: #F6FAF2;
+    overflow-x: hidden;
+    padding: 8px 0;
+}
+
