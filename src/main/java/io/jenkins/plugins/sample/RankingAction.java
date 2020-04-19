@@ -1,17 +1,19 @@
 package io.jenkins.plugins.sample;
 
 import hudson.Extension;
-import hudson.model.AbstractDescribableImpl;
 import hudson.model.Action;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.Project;
 import hudson.util.FormValidation;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import javax.servlet.ServletException;
 import jenkins.model.TransientActionFactory;
@@ -24,7 +26,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 /**
-* HelloWorldAction is responsible for serving
+* HelloWorldAction is resposible for serving
 * data to the plugin front-end.
 */
 public class RankingAction implements Action {
@@ -32,7 +34,7 @@ public class RankingAction implements Action {
   private transient FileComparator fc;
   private transient Map<String, Double> matchedFiles;
 
-  private String codeLocation;
+  private String codeLocation = "";
   private String report = "";
   private int numResults = 5;
 
@@ -46,13 +48,31 @@ public class RankingAction implements Action {
   public RankingAction(Project project) {
     this.project = project;
 
-    this.codeLocation = "/home/tanner/School/Project/Lang/src/main"; //TODO DELETE
-    /*
-    this.codeLocation = codeLocation;
-    this.report = report;
-    */
+    // Load properties
+    Properties loadProps = new Properties();
+    try {
+      loadProps.loadFromXML(new FileInputStream("settings.xml"));
+    } catch (IOException e) {
+      System.err.println("FAILURE: Failed to load properties");
+    }
+    codeLocation = loadProps.getProperty("codeLocation");
+    String numResultsStr = loadProps.getProperty("numResults");
+    try {
+      numResults = Integer.parseInt(numResultsStr);
+      if (numResults < 1) {
+        numResults = 1;
+      } 
+    } catch (NumberFormatException e) {
+      System.err.println("FAILURE: Failed to load number of results from properties");
+    }
+     
+
     fc = new FileComparator("Lang");
-    fc.trackDirectory(codeLocation);
+    // Get all the file locations
+    String[] locations = codeLocation.split("\\r?\\n");
+    for (String location : locations) {
+      fc.trackDirectory(location);
+    }
 
     System.err.println("===========REINIT ACTION============");
   }
@@ -108,7 +128,7 @@ public class RankingAction implements Action {
     }
 
     // Get all the file locations
-    String locations[] = codeLocation.split("\\r?\\n");
+    String[] locations = codeLocation.split("\\r?\\n");
     for (String location : locations) {
       fc.trackDirectory(location);
     }
@@ -117,6 +137,17 @@ public class RankingAction implements Action {
     if (!report.isEmpty()) {
       matchedFiles = fc.compare(report, numResults);
     } 
+
+    // Save properties
+    Properties saveProps = new Properties();
+    saveProps.setProperty("codeLocation", codeLocation);
+    saveProps.setProperty("numResults", numResultsStr);
+
+    try {
+      saveProps.storeToXML(new FileOutputStream("settings.xml"), "");
+    } catch (IOException e) {
+      System.err.println("FAILURE: Failed to write properties to file");
+    }
       
     return new HttpRedirect("settings");
   } 
