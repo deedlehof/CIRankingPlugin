@@ -34,6 +34,7 @@ public class RankingAction implements Action {
 
   private String codeLocation;
   private String report = "";
+  private int numResults = 5;
 
   private Project project;
 
@@ -53,13 +54,6 @@ public class RankingAction implements Action {
     fc = new FileComparator("Lang");
     fc.trackDirectory(codeLocation);
 
-    /*
-    matchedFiles = fc.compare(report, 5);
-    System.err.println("=======TOP MATCHING FILES=========");
-    for (Map.Entry<String, Double> entry: matchedFiles.entrySet()) {
-      System.out.println(entry.getValue() + " --- " + entry.getKey());
-    }
-    */
     System.err.println("===========REINIT ACTION============");
   }
 
@@ -69,6 +63,10 @@ public class RankingAction implements Action {
 
   public String getReport() {
     return report;
+  } 
+
+  public int getNumResults() {
+    return numResults;
   } 
 
   public Map<String, Integer> getMatchedFiles() {
@@ -87,7 +85,7 @@ public class RankingAction implements Action {
   public HttpResponse doCalculateResults(StaplerRequest req) throws IOException, ServletException {
     JSONObject jsonData = req.getSubmittedForm();
     report = jsonData.optString("bugReport");
-    matchedFiles = fc.compare(report, 5);
+    matchedFiles = fc.compare(report, numResults);
     System.err.println("=======TOP MATCHING FILES=========");
     for (Map.Entry<String, Double> entry: matchedFiles.entrySet()) {
       System.out.println(entry.getValue() + " --- " + entry.getKey());
@@ -98,6 +96,28 @@ public class RankingAction implements Action {
   public HttpResponse doSetProperties(StaplerRequest req) throws IOException, ServletException {
     JSONObject jsonData = req.getSubmittedForm();
     codeLocation = jsonData.optString("codeLocation");
+    String numResultsStr = jsonData.optString("numResults");
+    // Convert field to integer
+    try {
+      numResults = Integer.parseInt(numResultsStr);
+      if (numResults < 1) {
+        numResults = 1;
+      } 
+    } catch (NumberFormatException e) {
+      numResults = 5;
+    }
+
+    // Get all the file locations
+    String locations[] = codeLocation.split("\\r?\\n");
+    for (String location : locations) {
+      fc.trackDirectory(location);
+    }
+   
+    // Get new matched files
+    if (!report.isEmpty()) {
+      matchedFiles = fc.compare(report, numResults);
+    } 
+      
     return new HttpRedirect("settings");
   } 
 
@@ -134,7 +154,7 @@ public class RankingAction implements Action {
         ra = new RankingAction(project);
 	this.project = project;
       } 
-      //return Collections.singleton(new RankingAction(project));
+      // Return Collections.singleton(new RankingAction(project));
       return Collections.singleton(ra);
     } 
   } 

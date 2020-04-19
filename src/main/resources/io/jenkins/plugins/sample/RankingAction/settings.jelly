@@ -45,7 +45,7 @@
 
 	div.form-code-location {
 	    border: 1px solid black;
-	    height: 50px;
+	    height: 70px;
 	    overflow: hidden;
 	}
 
