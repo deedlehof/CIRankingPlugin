@@ -89,6 +89,12 @@ public class RankingAction implements Action {
     return numResults;
   } 
 
+  /**
+  * Converts top matching files from (String, Double) to (String, Integer), with the value being the
+  * percent match and returns it.
+  *
+  * @return a Map containing file names and their percent match to query
+  */
   public Map<String, Integer> getMatchedFiles() {
     Map<String, Integer> formatted = new LinkedHashMap<>();
     for (Map.Entry<String, Double> match: matchedFiles.entrySet()) {
@@ -102,6 +108,11 @@ public class RankingAction implements Action {
     return keys.toArray(new String[keys.size()]);
   }
 
+  /**
+  * Takes data from search page and updates top matching files for query.
+  *
+  * @return am HttpRedirect to return to the index page
+  */
   public HttpResponse doCalculateResults(StaplerRequest req) throws IOException, ServletException {
     JSONObject jsonData = req.getSubmittedForm();
     report = jsonData.optString("bugReport");
@@ -113,6 +124,11 @@ public class RankingAction implements Action {
     return new HttpRedirect("index");
   } 
 
+  /**
+  * Takes data from the settings page, updates them, and stores them as properties.
+  *
+  * @return an HttpRedirect to return to the settings page
+  */
   public HttpResponse doSetProperties(StaplerRequest req) throws IOException, ServletException {
     JSONObject jsonData = req.getSubmittedForm();
     codeLocation = jsonData.optString("codeLocation");

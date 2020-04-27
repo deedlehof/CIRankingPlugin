@@ -86,7 +86,18 @@
 	    <version>3.9</version>
 	</dependency>
     </dependencies>
-
+    <build>
+	<plugins>
+	    <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-javadoc-plugin</artifactId>
+		<version>3.2.0</version>
+		<configuration>
+		    <javadocExecutable>/usr/lib/jvm/java-11-openjdk-amd64/bin/javadoc</javadocExecutable>
+		</configuration>
+	    </plugin>
+	</plugins>
+    </build>
     <!-- If you want this to appear on the wiki page:
     <developers>
       <developer>

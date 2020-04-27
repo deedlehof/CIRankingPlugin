@@ -177,6 +177,8 @@ public class FileComparator {
     Map<String, Double> fileScores = new LinkedHashMap<>();
     // Calculate score
     surfaceSimilarity(fileScores, text);
+    // TODO Add more scoring methods?
+
     // Sort the map by converting it to a list 
     // List sorting has O(n * log n) time complexity
     List<Entry<String, Double>> scoresList = new ArrayList<>(fileScores.entrySet());
