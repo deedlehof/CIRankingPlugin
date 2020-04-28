@@ -28,18 +28,10 @@ public class HelloWorldAction implements RunAction2 {
   * @param bugReport  the bug report to be compared
   */
   public HelloWorldAction(String codeLocation, String bugReport) {
-    this.codeLocation = codeLocation;
     this.bugReport = bugReport;
-
-    fc = new FileComparator("Lang");
-    fc.trackDirectory(codeLocation);
-
-    matchedFiles = fc.compare(bugReport, 5);
-    System.err.println("=======TOP MATCHING FILES=========");
-    for (Map.Entry<String, Double> entry: matchedFiles.entrySet()) {
-      System.out.println(entry.getValue() + " --- " + entry.getKey());
-    }
     
+    Accuracy accTest = Accuracy.getInstance();
+    this.codeLocation = accTest.projectAccuracy("Lang");
   }
 
   public String getCodeLocation() {

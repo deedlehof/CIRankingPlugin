@@ -20,7 +20,7 @@ public class TestProgram {
   private ArrayList<String> bugInfo;
   private int currentBugID = 1;
   private int numOfBugs = -1;
-  private static final String defects4jDir = "/home/tanner/School/616/defects4j";
+  private static final String defects4jDir = "/home/tanner/School/Project/defects4j";
   private static final String defects4jExecutable = defects4jDir + "/framework/bin/defects4j";
   private static final String srcCodeBaseDir = "/tmp/";
 
@@ -95,7 +95,7 @@ public class TestProgram {
     try {
       page = Jsoup.connect(url).get();
     } catch (IOException e) {
-      return "Failed to grab page.";
+      return null;
     }
 
     // TODO make compatible with all projects

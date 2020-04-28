@@ -67,7 +67,24 @@ public class FileComparator {
     }
     return tracked;
   }
-  
+
+  /**
+  * Deletes the files cached from the search process.
+  *
+  * @return a boolean indicating deletion success
+  */
+  public boolean deleteCache() {
+    return deleteDirectory(new File(cacheDirectory));
+  } 
+
+  //Recursively delete all directory contents
+  private boolean deleteDirectory(File dirToDelete) {
+    File[] dirContents = dirToDelete.listFiles();
+    for (File file : dirContents) {
+      deleteDirectory(file);
+    }
+    return dirToDelete.delete();
+  } 
 
   /**
    * Tracks all of the files within directory, recursively including all files in subdirectories.
